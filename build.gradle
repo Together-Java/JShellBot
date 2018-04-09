@@ -15,6 +15,15 @@ jar {
     }
 }
 
+task fatJar(type: Jar) {
+    baseName = project.name + '-all'
+    manifest {
+        attributes('Main-Class': 'org.togetherjava.discord.server.JShellBot')
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 repositories {
     mavenCentral()
     jcenter() //This prevents issues with transitive dependencies
