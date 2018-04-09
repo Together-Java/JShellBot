@@ -3,4 +3,4 @@ out/
 gradle/
 .idea/
 .gradle/
-/bot.properties
+src/main/resources/bot.properties
