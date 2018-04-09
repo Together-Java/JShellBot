@@ -10,6 +10,9 @@ jar {
     manifest {
         attributes('Main-Class': 'org.togetherjava.discord.server.JShellBot')
     }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 repositories {
