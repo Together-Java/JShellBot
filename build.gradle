@@ -4,6 +4,13 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 
 sourceCompatibility = 1.9
+targetCompatibility = 1.9
+
+jar {
+    manifest {
+        attributes('Main-Class': 'org.togetherjava.discord.server.JShellBot')
+    }
+}
 
 repositories {
     mavenCentral()
@@ -25,11 +32,8 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-util', version: '9.4.8.v20171121'
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-
     // https://mvnrepository.com/artifact/org.ow2.asm/asm
     compile group: 'org.ow2.asm', name: 'asm', version: '6.1.1'
-
-
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12
     testCompile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
 }
