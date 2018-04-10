@@ -19,7 +19,7 @@ public class Config {
      */
     public Config(Path configPath) throws IOException {
         Properties defaults = new Properties();
-        loadFromStream(defaults, getClass().getResourceAsStream("/bot.properties"));
+        loadFromStream(defaults, getClass().getResourceAsStream("/bot.properties.example"));
 
         this.properties = new Properties(defaults);
 
