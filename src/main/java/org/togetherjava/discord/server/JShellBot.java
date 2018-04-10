@@ -30,7 +30,7 @@ public class JShellBot {
     public void start() throws Exception {
         log.info("Goliath Online");
 
-        String botConfigPathString = System.getenv("JSHELL-BOT-CONFIG");
+        String botConfigPathString = System.getenv("JSHELL_BOT_CONFIG");
         Path botConfigPath = botConfigPathString == null ? null : Paths.get(botConfigPathString);
 
         Config config = new Config(botConfigPath);
