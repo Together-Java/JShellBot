@@ -23,6 +23,10 @@ public class FilteredExecutionControl extends LocalExecutionControl {
         blockPackage("java.lang.invoke");
         blockMethod("java.lang.reflect.Method", "invoke");
         blockMethod("java.lang.System", "exit");
+        blockMethod("java.lang.Thread", "sleep");
+        blockMethod("java.lang.Thread", "wait");
+        blockMethod("java.lang.Thread", "notify");
+        blockMethod("java.lang.Thread", "currentThread");
     }
 
     public void blockMethod(String clazz, String methodName) {
@@ -66,7 +70,7 @@ public class FilteredExecutionControl extends LocalExecutionControl {
                 throw new UnsupportedOperationException("Naughty (class): " + owner);
             }
             if (blockedMethods.contains(new ImmutablePair<>(sanitizeClassName(owner), name))) {
-                throw new UnsupportedOperationException("Naughty (meth): " + owner);
+                throw new UnsupportedOperationException("Naughty (meth): " + owner + "#" + name);
             }
             if (blockedPackages.contains(sanitizeClassName(owner.substring(0, owner.lastIndexOf('/'))))) {
                 throw new UnsupportedOperationException("Naughty (pack): " + owner);
