@@ -47,7 +47,7 @@ public class FilteredExecutionControlProvider implements ExecutionControlProvide
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if ("load".equals(method.getName())
-                    && method.getParameterTypes()[0] == ExecutionControl.ClassBytecodes.class
+                    && method.getParameterTypes()[0] == ExecutionControl.ClassBytecodes[].class
                     && args.length != 0) {
 
                 target.load((ExecutionControl.ClassBytecodes[]) args[0]);
