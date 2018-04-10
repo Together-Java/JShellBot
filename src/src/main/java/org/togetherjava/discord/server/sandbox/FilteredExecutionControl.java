@@ -22,6 +22,9 @@ public class FilteredExecutionControl extends LocalExecutionControl {
         blockPackage("java.lang.reflect");
         blockPackage("java.lang.invoke");
         blockMethod("java.lang.reflect.Method", "invoke");
+        blockClass("java.lang.ProcessBuilder");
+        blockClass("java.lang.ProcessHandle");
+        blockClass("java.lang.Runtime");
     }
 
     public void blockMethod(String clazz, String methodName) {
