@@ -27,6 +27,14 @@ public class FilteredExecutionControl extends LocalExecutionControl {
         blockMethod("java.lang.Thread", "wait");
         blockMethod("java.lang.Thread", "notify");
         blockMethod("java.lang.Thread", "currentThread");
+/*
+        blockPackage("java.lang.reflect");
+        blockPackage("java.lang.invoke");
+        blockMethod("java.lang.reflect.Method", "invoke");
+        blockClass("java.lang.ProcessBuilder");
+        blockClass("java.lang.ProcessHandle");
+        blockClass("java.lang.Runtime");
+        */
     }
 
     public void blockMethod(String clazz, String methodName) {
