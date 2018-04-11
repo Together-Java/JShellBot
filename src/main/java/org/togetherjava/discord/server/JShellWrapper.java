@@ -70,7 +70,7 @@ public class JShellWrapper {
 
         JShellResult(List<SnippetEvent> events, String stdout) {
             this.events = events;
-            this.stdout = stdout;
+            this.stdout = stdout == null ? "" : stdout;
         }
 
         public List<SnippetEvent> getEvents() {
