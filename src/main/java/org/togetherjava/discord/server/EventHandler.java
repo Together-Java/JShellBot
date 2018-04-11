@@ -1,6 +1,7 @@
 package org.togetherjava.discord.server;
 
 import jdk.jshell.SnippetEvent;
+import org.togetherjava.discord.server.execution.JShellWrapper;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;

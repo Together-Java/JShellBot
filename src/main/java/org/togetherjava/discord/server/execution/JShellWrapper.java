@@ -1,4 +1,4 @@
-package org.togetherjava.discord.server;
+package org.togetherjava.discord.server.execution;
 
 import jdk.jshell.JShell;
 import jdk.jshell.SnippetEvent;
