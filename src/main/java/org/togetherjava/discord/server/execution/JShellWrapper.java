@@ -42,6 +42,15 @@ public class JShellWrapper {
         }
     }
 
+    /**
+     * Closes the {@link JShell} session.
+     *
+     * @see JShell#close()
+     */
+    public void close() {
+        jShell.close();
+    }
+
     public JShellResult eval(String command) {
         try {
             return new JShellResult(evaluate(command), getStandardOut());
