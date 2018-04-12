@@ -1,24 +1,26 @@
 package org.togetherjava.discord.server;
 
 import jdk.jshell.SnippetEvent;
+import org.togetherjava.discord.server.execution.JShellSessionManager;
+import org.togetherjava.discord.server.execution.JShellWrapper;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.MessageBuilder;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EventHandler {
     private static final Pattern CODE_BLOCK_EXTRACTOR_PATTERN = Pattern.compile("```(java)?\\s*([\\w\\W]+)```");
 
-    private ConcurrentHashMap<String, JShellWrapper> sessions;
+    private JShellSessionManager jShellSessionManager;
     private final String botPrefix;
 
     public EventHandler(Config config) {
-        sessions = new ConcurrentHashMap<>();
+        jShellSessionManager = new JShellSessionManager(Duration.ofMinutes(15));
         botPrefix = config.getString("prefix");
     }
 
@@ -28,11 +30,7 @@ public class EventHandler {
         if (message.startsWith(botPrefix)) {
             String command = parseCommandFromMessage(message);
             String authorID = event.getAuthor().getStringID();
-            JShellWrapper shell = sessions.get(authorID);
-            if (shell == null) {
-                shell = new JShellWrapper();
-                sessions.put(authorID, shell);
-            }
+            JShellWrapper shell = jShellSessionManager.getSessionOrCreate(authorID);
 
             executeCommand(event.getAuthor(), shell, command, event.getChannel());
         }

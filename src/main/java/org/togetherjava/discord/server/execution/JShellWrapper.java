@@ -1,4 +1,4 @@
-package org.togetherjava.discord.server;
+package org.togetherjava.discord.server.execution;
 
 import jdk.jshell.JShell;
 import jdk.jshell.SnippetEvent;
@@ -42,6 +42,15 @@ public class JShellWrapper {
         }
     }
 
+    /**
+     * Closes the {@link JShell} session.
+     *
+     * @see JShell#close()
+     */
+    public void close() {
+        jShell.close();
+    }
+
     public JShellResult eval(String command) {
         try {
             return new JShellResult(evaluate(command), getStandardOut());
@@ -70,7 +79,7 @@ public class JShellWrapper {
 
         JShellResult(List<SnippetEvent> events, String stdout) {
             this.events = events;
-            this.stdout = stdout;
+            this.stdout = stdout == null ? "" : stdout;
         }
 
         public List<SnippetEvent> getEvents() {
