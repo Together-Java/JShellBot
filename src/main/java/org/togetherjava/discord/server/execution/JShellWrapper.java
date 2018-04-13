@@ -74,12 +74,26 @@ public class JShellWrapper {
         jShell.close();
     }
 
+    /**
+     * Evaluates a command and returns the resulting snippet events and stdout.
+     * <p>
+     * May throw an exception.
+     *
+     * @param command the command to run
+     * @return the result of running it
+     */
     public JShellResult eval(String command) {
-        try {
-            return new JShellResult(evaluate(command), getStandardOut());
-        } catch (Throwable e) {
-            return new JShellResult(List.of(), e.getMessage());
-        }
+        return new JShellResult(evaluate(command), getStandardOut());
+    }
+
+    /**
+     * Returns the diagnostics for the snippet. This includes things like compilation errors.
+     *
+     * @param snippet the snippet to return them for
+     * @return all found diagnostics
+     */
+    public Stream<Diag> getSnippetDiagnostics(Snippet snippet) {
+        return jShell.diagnostics(snippet);
     }
 
     private List<SnippetEvent> evaluate(String command) {
