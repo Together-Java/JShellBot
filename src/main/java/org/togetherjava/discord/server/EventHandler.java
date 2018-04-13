@@ -127,11 +127,11 @@ public class EventHandler {
                 .withTitle(user.getName() + "'s Result");
 
         embedBuilder.appendField("Type", exception.getClass().getSimpleName(), true);
-        embedBuilder.appendField("Message", "`" + exception.getMessage() + "'", true);
+        embedBuilder.appendField("Message", "`" + exception.getMessage() + "`", true);
 
         if (exception.getCause() != null) {
             embedBuilder.appendField("Cause type", exception.getCause().getClass().getSimpleName(), true);
-            embedBuilder.appendField("Cause Message", "`" + exception.getCause().getMessage() + "'", true);
+            embedBuilder.appendField("Cause Message", "`" + exception.getCause().getMessage() + "`", true);
         }
 
         messageBuilder.withEmbed(embedBuilder.build());
