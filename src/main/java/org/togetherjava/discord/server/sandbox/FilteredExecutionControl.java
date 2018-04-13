@@ -75,9 +75,22 @@ public class FilteredExecutionControl extends LocalExecutionControl {
             if (blockedMethods.contains(new ImmutablePair<>(sanitizeClassName(owner), name))) {
                 throw new UnsupportedOperationException("Naughty (meth): " + owner + "#" + name);
             }
-            if (blockedPackages.contains(sanitizeClassName(owner.substring(0, owner.lastIndexOf('/'))))) {
+            if (isPackageOrParentBlocked(sanitizeClassName(owner))) {
                 throw new UnsupportedOperationException("Naughty (pack): " + owner);
             }
+        }
+
+        private boolean isPackageOrParentBlocked(String sanitizedPackage) {
+            if (sanitizedPackage == null || sanitizedPackage.isEmpty()) {
+                return false;
+            }
+            if (blockedPackages.contains(sanitizedPackage)) {
+                return true;
+            }
+
+            int nextDot = sanitizedPackage.lastIndexOf('.');
+
+            return nextDot >= 0 && isPackageOrParentBlocked(sanitizedPackage.substring(0, nextDot));
         }
 
         private String sanitizeClassName(String owner) {
