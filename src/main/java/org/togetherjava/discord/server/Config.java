@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 public class Config {
@@ -45,5 +48,16 @@ public class Config {
      */
     public String getString(String key) {
         return properties.getProperty(key);
+    }
+
+    /**
+     * Returns a property from the config splitting at {@code ","} and putting it in a list.
+     *
+     * @param key the key
+     * @return the property or an empty list if not found
+     */
+    public List<String> getCommaSeparatedList(String key) {
+        String value = getString(key);
+        return value == null ? Collections.emptyList() : Arrays.asList(value.split(","));
     }
 }

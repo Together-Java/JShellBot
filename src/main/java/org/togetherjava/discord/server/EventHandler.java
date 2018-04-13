@@ -20,7 +20,7 @@ public class EventHandler {
     private final String botPrefix;
 
     public EventHandler(Config config) {
-        jShellSessionManager = new JShellSessionManager(Duration.ofMinutes(15));
+        jShellSessionManager = new JShellSessionManager(Duration.ofMinutes(15), config);
         botPrefix = config.getString("prefix");
     }
 
