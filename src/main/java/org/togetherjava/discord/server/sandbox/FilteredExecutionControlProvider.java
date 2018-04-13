@@ -6,6 +6,7 @@ import jdk.jshell.spi.ExecutionControlProvider;
 import jdk.jshell.spi.ExecutionEnv;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
@@ -53,7 +54,12 @@ public class FilteredExecutionControlProvider implements ExecutionControlProvide
                 target.load((ExecutionControl.ClassBytecodes[]) args[0]);
             }
 
-            return method.invoke(hijackedExecutionControl, args);
+            // this unwrapping is necessary for JShell to detect that an exception it can handle was thrown
+            try {
+                return method.invoke(hijackedExecutionControl, args);
+            } catch (InvocationTargetException e) {
+                throw e.getCause();
+            }
         }
     }
 }
