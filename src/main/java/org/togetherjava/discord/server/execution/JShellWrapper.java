@@ -28,22 +28,22 @@ public class JShellWrapper {
     private JShell jShell;
     private StringOutputStream outputStream;
     private Sandbox sandbox;
-    private Config config;
+    private TimeWatchdog watchdog;
 
-    public JShellWrapper(Config config) {
-        this.config = config;
+    public JShellWrapper(Config config, TimeWatchdog watchdog) {
+        this.watchdog = watchdog;
         this.outputStream = new StringOutputStream(Character.BYTES * 1600);
-        this.jShell = buildJShell(outputStream);
+        this.jShell = buildJShell(outputStream, config);
         this.sandbox = new Sandbox();
     }
 
-    private JShell buildJShell(OutputStream outputStream) {
+    private JShell buildJShell(OutputStream outputStream, Config config) {
         try {
             PrintStream out = new PrintStream(outputStream, true, "UTF-8");
             return JShell.builder()
                     .out(out)
                     .err(out)
-                    .executionEngine(getExecutionControlProvider(), Map.of())
+                    .executionEngine(getExecutionControlProvider(config), Map.of())
                     .build();
         } catch (UnsupportedEncodingException e) {
             LOGGER.warn("Unsupported encoding: UTF-8. How?", e);
@@ -52,7 +52,7 @@ public class JShellWrapper {
         }
     }
 
-    private FilteredExecutionControlProvider getExecutionControlProvider() {
+    private FilteredExecutionControlProvider getExecutionControlProvider(Config config) {
         return new FilteredExecutionControlProvider(
                 config.getCommaSeparatedList("blocked.packages"),
                 config.getCommaSeparatedList("blocked.classes"),
@@ -83,7 +83,14 @@ public class JShellWrapper {
      * @return the result of running it
      */
     public JShellResult eval(String command) {
-        return new JShellResult(evaluate(command), getStandardOut());
+        try {
+            List<SnippetEvent> evaluate = watchdog.runWatched(() -> evaluate(command), jShell::stop);
+
+            return new JShellResult(evaluate, getStandardOut());
+        } finally {
+            // always remove the output stream so it does not linger in case of an exception
+            outputStream.reset();
+        }
     }
 
     /**
@@ -101,10 +108,7 @@ public class JShellWrapper {
     }
 
     private String getStandardOut() {
-        String string = outputStream.toString();
-        outputStream.reset();
-
-        return string;
+        return outputStream.toString();
     }
 
     /**

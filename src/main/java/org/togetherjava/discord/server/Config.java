@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.Duration;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +50,20 @@ public class Config {
      */
     public String getString(String key) {
         return properties.getProperty(key);
+    }
+
+    /**
+     * Tries to parse an entry in ISO-8601 duration format.
+     *
+     * @param key the key to look up
+     * @return the parsed duration or null if parsing was impossible.
+     */
+    public Duration getDuration(String key) {
+        try {
+            return Duration.parse(getString(key));
+        } catch (DateTimeParseException e) {
+            return null;
+        }
     }
 
     /**
