@@ -10,9 +10,9 @@ BASE_DIR=$JSBOT_INSTALL
 gradle clean
 if gradle fatJar; then
   #move all jar files to the new location
-  pattern="./build/libs/org.togetherjava.*.jar"
+  pattern="build/libs/org.togetherjava.*.jar"
   files=( $pattern )
-  echo "${files[0]}"
+  echo "${files[0]} copied"
   cp ${files[0]} $JSBOT_INSTALL/jshellbot.jar
   #copy jshellbot.sh and create service
   sudo cp ./jshellbot.sh /etc/init.d/
