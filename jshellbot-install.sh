@@ -15,7 +15,7 @@ if gradle fatJar; then
   echo "${files[0]} copied"
   cp ${files[0]} $JSBOT_INSTALL/jshellbot.jar
   #copy jshellbot.sh and create service
-  sudo cp ./jshellbot.sh /etc/init.d/
+  sudo cp jshellbot.sh /etc/init.d/
   echo "Service installed. To start type `service jshellbot start`"
 else
   echo "Failed to install service"
