@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ -z ${JSBOT_INSTALL+x}]; then
+if [ -z ${JSBOT_INSTALL+x} ]; then
   echo "JSBOT_INSTALL needs to be set as an environment variable"
   exit 1
 fi
@@ -15,7 +15,7 @@ if gradle fatJar; then
   echo "${files[0]}"
   cp ${files[0]} $JSBOT_INSTALL/jshellbot.jar
   #copy jshellbot.sh and create service
-  cp ./jshellbot.sh /etc/init.d/
+  sudo cp ./jshellbot.sh /etc/init.d/
   echo "Service installed. To start type `service jshellbot start`"
 else
   echo "Failed to install service"
