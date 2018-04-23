@@ -5,43 +5,53 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.objectweb.asm.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class FilteredExecutionControl extends LocalExecutionControl {
 
-    private Set<Pair<String, String>> blockedMethods;
-    private Set<String> blockedPackages;
-    private Set<String> blockedClasses;
+    private final List<Pair<String, Pattern>> blockedMethods;
+    private final List<Pattern> blockedPackages;
+    private final List<Pattern> blockedClasses;
 
-    public FilteredExecutionControl() {
-        blockedMethods = new HashSet<>();
-        blockedPackages = new HashSet<>();
-        blockedClasses = new HashSet<>();
+    /**
+     * Creates a new {@link FilteredExecutionControl}.
+     *
+     * @param blockedPackages a collection with regular expressions for blocked packages
+     * @param blockedClasses  a collection with regular expressions for blocked classes
+     * @param blockedMethods  a collection in the form of {@code "ClassName -> Method regular expression"}
+     */
+    FilteredExecutionControl(Collection<String> blockedPackages, Collection<String> blockedClasses,
+                             Collection<Pair<String, String>> blockedMethods) {
 
-        blockPackage("java.lang.reflect");
-        blockPackage("java.lang.invoke");
-        blockClass("java.lang.ProcessBuilder");
-        blockClass("java.lang.ProcessHandle");
-        blockClass("java.lang.Runtime");
-        blockMethod("java.lang.reflect.Method", "invoke");
-        blockMethod("java.lang.System", "exit");
-        blockMethod("java.lang.Thread", "sleep");
-        blockMethod("java.lang.Thread", "wait");
-        blockMethod("java.lang.Thread", "notify");
-        blockMethod("java.lang.Thread", "currentThread");
+        this.blockedMethods = new ArrayList<>();
+        this.blockedPackages = new ArrayList<>();
+        this.blockedClasses = new ArrayList<>();
+
+        // TODO: Not really our job to parse that.
+        for (String packagePattern : blockedPackages) {
+            blockPackage(Pattern.compile(packagePattern));
+        }
+        for (String classPattern : blockedClasses) {
+            blockClass(Pattern.compile(classPattern));
+        }
+        for (Pair<String, String> pair : blockedMethods) {
+            blockMethod(pair.getKey(), Pattern.compile(pair.getValue()));
+        }
     }
 
-    public void blockMethod(String clazz, String methodName) {
+    private void blockMethod(String clazz, Pattern methodName) {
         blockedMethods.add(new ImmutablePair<>(clazz, methodName));
     }
 
-    public void blockPackage(String packageName) {
-        blockedPackages.add(packageName);
+    private void blockPackage(Pattern packagePattern) {
+        blockedPackages.add(packagePattern);
     }
 
-    public void blockClass(String clazz) {
-        blockedClasses.add(clazz);
+    private void blockClass(Pattern classPattern) {
+        blockedClasses.add(classPattern);
     }
 
 
@@ -61,6 +71,35 @@ public class FilteredExecutionControl extends LocalExecutionControl {
         super.load(cbcs);
     }
 
+    private boolean isClassBlocked(String name) {
+        return blockedClasses.stream().map(Pattern::asPredicate).anyMatch(pred -> pred.test(name));
+    }
+
+    private boolean isMethodBlocked(String className, String methodName) {
+        return blockedMethods.stream()
+                .filter(pair -> pair.getKey().equals(className))
+                .map(pair -> pair.getValue().asPredicate())
+                .anyMatch(pred -> pred.test(methodName));
+    }
+
+    private boolean isPackageBlocked(String packageName) {
+        return blockedPackages.stream().map(Pattern::asPredicate).anyMatch(pred -> pred.test(packageName));
+    }
+
+    private boolean isPackageOrParentBlocked(String sanitizedPackage) {
+        if (sanitizedPackage == null || sanitizedPackage.isEmpty()) {
+            return false;
+        }
+        if (isPackageBlocked(sanitizedPackage)) {
+            return true;
+        }
+
+        int nextDot = sanitizedPackage.lastIndexOf('.');
+
+        return nextDot >= 0 && isPackageOrParentBlocked(sanitizedPackage.substring(0, nextDot));
+    }
+
+
     private class FilteringMethodVisitor extends MethodVisitor {
         private FilteringMethodVisitor() {
             super(Opcodes.ASM6);
@@ -69,13 +108,13 @@ public class FilteredExecutionControl extends LocalExecutionControl {
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String descriptor,
                                     boolean isInterface) {
-            if (blockedClasses.contains(sanitizeClassName(owner))) {
+            if (isClassBlocked(sanitizeClassName(owner))) {
                 throw new UnsupportedOperationException("Naughty (class): " + owner);
             }
-            if (blockedMethods.contains(new ImmutablePair<>(sanitizeClassName(owner), name))) {
+            if (isMethodBlocked(sanitizeClassName(owner), name)) {
                 throw new UnsupportedOperationException("Naughty (meth): " + owner + "#" + name);
             }
-            if (blockedPackages.contains(sanitizeClassName(owner.substring(0, owner.lastIndexOf('/'))))) {
+            if (isPackageOrParentBlocked(sanitizeClassName(owner))) {
                 throw new UnsupportedOperationException("Naughty (pack): " + owner);
             }
         }

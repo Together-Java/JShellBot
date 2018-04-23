@@ -4,18 +4,27 @@ import jdk.jshell.execution.JdiExecutionControlProvider;
 import jdk.jshell.spi.ExecutionControl;
 import jdk.jshell.spi.ExecutionControlProvider;
 import jdk.jshell.spi.ExecutionEnv;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collection;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class FilteredExecutionControlProvider implements ExecutionControlProvider {
 
     private final JdiExecutionControlProvider jdiExecutionControlProvider;
+    private final Supplier<FilteredExecutionControl> executionControlSupplier;
 
-    public FilteredExecutionControlProvider() {
-        jdiExecutionControlProvider = new JdiExecutionControlProvider();
+    public FilteredExecutionControlProvider(Collection<String> blockedPackages, Collection<String> blockedClasses,
+                                            Collection<Pair<String, String>> blockedMethods) {
+        this.jdiExecutionControlProvider = new JdiExecutionControlProvider();
+        this.executionControlSupplier = () -> new FilteredExecutionControl(
+                blockedPackages, blockedClasses, blockedMethods
+        );
     }
 
     @Override
@@ -26,7 +35,7 @@ public class FilteredExecutionControlProvider implements ExecutionControlProvide
     @Override
     public ExecutionControl generate(ExecutionEnv env, Map<String, String> parameters) throws Throwable {
         ExecutionControl hijackedExecutionControl = jdiExecutionControlProvider.generate(env, parameters);
-        FilteredExecutionControl filteredExecutionControl = new FilteredExecutionControl();
+        FilteredExecutionControl filteredExecutionControl = executionControlSupplier.get();
 
         return (ExecutionControl) Proxy.newProxyInstance(
                 getClass().getClassLoader(),
@@ -53,7 +62,12 @@ public class FilteredExecutionControlProvider implements ExecutionControlProvide
                 target.load((ExecutionControl.ClassBytecodes[]) args[0]);
             }
 
-            return method.invoke(hijackedExecutionControl, args);
+            // this unwrapping is necessary for JShell to detect that an exception it can handle was thrown
+            try {
+                return method.invoke(hijackedExecutionControl, args);
+            } catch (InvocationTargetException e) {
+                throw e.getCause();
+            }
         }
     }
 }

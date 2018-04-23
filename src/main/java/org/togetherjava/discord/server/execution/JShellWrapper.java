@@ -1,9 +1,13 @@
 package org.togetherjava.discord.server.execution;
 
+import jdk.jshell.Diag;
 import jdk.jshell.JShell;
+import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.togetherjava.discord.server.Config;
 import org.togetherjava.discord.server.io.StringOutputStream;
 import org.togetherjava.discord.server.sandbox.FilteredExecutionControlProvider;
 import org.togetherjava.discord.server.sandbox.Sandbox;
@@ -14,6 +18,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class JShellWrapper {
 
@@ -22,8 +28,10 @@ public class JShellWrapper {
     private JShell jShell;
     private StringOutputStream outputStream;
     private Sandbox sandbox;
+    private Config config;
 
-    public JShellWrapper() {
+    public JShellWrapper(Config config) {
+        this.config = config;
         this.outputStream = new StringOutputStream(Character.BYTES * 1600);
         this.jShell = buildJShell(outputStream);
         this.sandbox = new Sandbox();
@@ -31,15 +39,30 @@ public class JShellWrapper {
 
     private JShell buildJShell(OutputStream outputStream) {
         try {
+            PrintStream out = new PrintStream(outputStream, true, "UTF-8");
             return JShell.builder()
-                    .out(new PrintStream(outputStream, true, "UTF-8"))
-                    .executionEngine(new FilteredExecutionControlProvider(), Map.of())
+                    .out(out)
+                    .err(out)
+                    .executionEngine(getExecutionControlProvider(), Map.of())
                     .build();
         } catch (UnsupportedEncodingException e) {
             LOGGER.warn("Unsupported encoding: UTF-8. How?", e);
 
             return JShell.create();
         }
+    }
+
+    private FilteredExecutionControlProvider getExecutionControlProvider() {
+        return new FilteredExecutionControlProvider(
+                config.getCommaSeparatedList("blocked.packages"),
+                config.getCommaSeparatedList("blocked.classes"),
+                config.getCommaSeparatedList("blocked.methods").stream()
+                        .map(s -> {
+                            String[] parts = s.split("#");
+                            return new ImmutablePair<>(parts[0], parts[1]);
+                        })
+                        .collect(Collectors.toList())
+        );
     }
 
     /**
@@ -51,12 +74,26 @@ public class JShellWrapper {
         jShell.close();
     }
 
+    /**
+     * Evaluates a command and returns the resulting snippet events and stdout.
+     * <p>
+     * May throw an exception.
+     *
+     * @param command the command to run
+     * @return the result of running it
+     */
     public JShellResult eval(String command) {
-        try {
-            return new JShellResult(evaluate(command), getStandardOut());
-        } catch (Throwable e) {
-            return new JShellResult(List.of(), e.getMessage());
-        }
+        return new JShellResult(evaluate(command), getStandardOut());
+    }
+
+    /**
+     * Returns the diagnostics for the snippet. This includes things like compilation errors.
+     *
+     * @param snippet the snippet to return them for
+     * @return all found diagnostics
+     */
+    public Stream<Diag> getSnippetDiagnostics(Snippet snippet) {
+        return jShell.diagnostics(snippet);
     }
 
     private List<SnippetEvent> evaluate(String command) {

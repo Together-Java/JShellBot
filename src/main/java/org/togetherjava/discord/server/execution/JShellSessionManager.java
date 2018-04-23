@@ -2,6 +2,7 @@ package org.togetherjava.discord.server.execution;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.togetherjava.discord.server.Config;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -13,11 +14,13 @@ public class JShellSessionManager {
 
     private ConcurrentHashMap<String, SessionEntry> sessionMap;
     private Duration timeToLive;
+    private Config config;
 
     private Thread ticker;
 
-    public JShellSessionManager(Duration timeToLive) {
+    public JShellSessionManager(Duration timeToLive, Config config) {
         this.timeToLive = timeToLive;
+        this.config = config;
 
         this.sessionMap = new ConcurrentHashMap<>();
 
@@ -48,7 +51,10 @@ public class JShellSessionManager {
         if (ticker == null) {
             throw new IllegalStateException("This manager was shutdown already.");
         }
-        SessionEntry sessionEntry = sessionMap.computeIfAbsent(userId, s -> new SessionEntry(new JShellWrapper(), s));
+        SessionEntry sessionEntry = sessionMap.computeIfAbsent(
+                userId,
+                s -> new SessionEntry(new JShellWrapper(config), s)
+        );
 
         return sessionEntry.getJShell();
     }
