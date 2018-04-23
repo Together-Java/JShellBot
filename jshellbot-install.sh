@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
 BASE_DIR=/opt/jshellbot/
+token="missing"
+
+read -p "Enter your bot token here: " token
+cp src/main/resources/bot.properties.example src/main/resources/bot.properties
+echo "$(grep -v "token=yourtokengoeshere" src/main/resources/bot.properties)" > src/main/resources/bot.properties
+echo "token=$token" >> src/main/resources/bot.properties
 
 gradle clean
 if gradle fatJar; then
