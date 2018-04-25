@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Supplier;
 
 public class JShellSessionManager {
 
@@ -22,6 +23,7 @@ public class JShellSessionManager {
     private Config config;
 
     private Thread ticker;
+    private Supplier<LocalDateTime> timeProvider;
 
     /**
      * Creates a new {@link JShellSessionManager} with the specified values.
@@ -31,6 +33,8 @@ public class JShellSessionManager {
     public JShellSessionManager(Config config) {
         this.config = config;
         this.watchdogExecutorService = Executors.newSingleThreadScheduledExecutor();
+        this.timeProvider = LocalDateTime::now;
+
         this.sessionMap = new ConcurrentHashMap<>();
 
         this.timeToLive = Objects.requireNonNull(
@@ -95,9 +99,9 @@ public class JShellSessionManager {
     /**
      * Purges sessions that were inactive for longer than the specified threshold.
      */
-    private void purgeOld() {
+    void purgeOld() {
         LOGGER.debug("Starting purge");
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = timeProvider.get();
 
         // A session could potentially be marked for removal, then another threads retrieves it and updates its
         // last accessed state, leading to an unnecessary deletion. This should not have any impact on the caller
@@ -118,6 +122,15 @@ public class JShellSessionManager {
 
             return tooOld;
         });
+    }
+
+    /**
+     * Sets the used time provider. Useful for testing only.
+     *
+     * @param timeProvider the provider to use
+     */
+    void setTimeProvider(Supplier<LocalDateTime> timeProvider) {
+        this.timeProvider = timeProvider;
     }
 
     private static class SessionEntry {
