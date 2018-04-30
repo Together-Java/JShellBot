@@ -1,5 +1,7 @@
 prefix=!jshell
 token=yourtokengoeshere
+session.ttl=PT15M
+computation.allotted_time=PT15S
 
 blocked.packages=sun,\
                  jdk,\

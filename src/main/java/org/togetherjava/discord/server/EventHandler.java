@@ -12,8 +12,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.MessageBuilder;
 
-import java.awt.*;
-import java.time.Duration;
+import java.awt.Color;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -28,8 +27,8 @@ public class EventHandler {
     private final String botPrefix;
 
     public EventHandler(Config config) {
-        jShellSessionManager = new JShellSessionManager(Duration.ofMinutes(15), config);
-        botPrefix = config.getString("prefix");
+        this.jShellSessionManager = new JShellSessionManager(config);
+        this.botPrefix = config.getString("prefix");
     }
 
     @EventSubscriber
