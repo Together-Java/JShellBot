@@ -36,7 +36,7 @@ public class StringOutputStream extends OutputStream {
     public void write(int b) throws IOException {
         ensureCapacity();
 
-        if (size < buffer.length) {
+        if (size < buffer.length && size < maxSize) {
             buffer[size++] = (byte) b;
         }
     }

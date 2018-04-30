@@ -8,6 +8,7 @@ import org.objectweb.asm.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 public class FilteredExecutionControl extends LocalExecutionControl {
@@ -72,18 +73,26 @@ public class FilteredExecutionControl extends LocalExecutionControl {
     }
 
     private boolean isClassBlocked(String name) {
-        return blockedClasses.stream().map(Pattern::asPredicate).anyMatch(pred -> pred.test(name));
+        return blockedClasses.stream()
+                .map(FilteredExecutionControl::asMatchingPredicate)
+                .anyMatch(pred -> pred.test(name));
     }
 
     private boolean isMethodBlocked(String className, String methodName) {
         return blockedMethods.stream()
                 .filter(pair -> pair.getKey().equals(className))
-                .map(pair -> pair.getValue().asPredicate())
+                .map(pair -> asMatchingPredicate(pair.getValue()))
                 .anyMatch(pred -> pred.test(methodName));
     }
 
     private boolean isPackageBlocked(String packageName) {
-        return blockedPackages.stream().map(Pattern::asPredicate).anyMatch(pred -> pred.test(packageName));
+        return blockedPackages.stream()
+                .map(FilteredExecutionControl::asMatchingPredicate)
+                .anyMatch(pred -> pred.test(packageName));
+    }
+
+    private static Predicate<String> asMatchingPredicate(Pattern pattern) {
+        return s -> pattern.matcher(s).matches();
     }
 
     private boolean isPackageOrParentBlocked(String sanitizedPackage) {
@@ -108,6 +117,15 @@ public class FilteredExecutionControl extends LocalExecutionControl {
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String descriptor,
                                     boolean isInterface) {
+            checkAccess(owner, name);
+        }
+
+        @Override
+        public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
+            checkAccess(owner, name);
+        }
+
+        private void checkAccess(String owner, String name) {
             if (isClassBlocked(sanitizeClassName(owner))) {
                 throw new UnsupportedOperationException("Naughty (class): " + owner);
             }
@@ -122,7 +140,6 @@ public class FilteredExecutionControl extends LocalExecutionControl {
         private String sanitizeClassName(String owner) {
             return owner.replace("/", ".");
         }
-
 
         @Override
         public void visitInvokeDynamicInsn(String name, String descriptor, Handle bootstrapMethodHandle,

@@ -23,14 +23,20 @@ public class Config {
      * @throws IOException if an error occurs reading the config
      */
     public Config(Path configPath) throws IOException {
-        Properties defaults = new Properties();
-        loadFromStream(defaults, getClass().getResourceAsStream("/bot.properties"));
-
-        this.properties = new Properties(defaults);
+        this(new Properties());
 
         if (configPath != null && Files.exists(configPath)) {
             loadFromStream(properties, Files.newInputStream(configPath, StandardOpenOption.READ));
         }
+    }
+
+    /**
+     * Creates a config consisting of the given properties.
+     *
+     * @param properties the {@link Properties} to use
+     */
+    public Config(Properties properties) {
+        this.properties = new Properties(properties);
     }
 
     private void loadFromStream(Properties properties, InputStream stream) throws IOException {
