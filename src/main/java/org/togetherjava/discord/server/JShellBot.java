@@ -1,8 +1,5 @@
 package org.togetherjava.discord.server;
 
-import org.apache.commons.daemon.Daemon;
-import org.apache.commons.daemon.DaemonContext;
-import org.apache.commons.daemon.DaemonInitException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sx.blah.discord.api.IDiscordClient;
