@@ -1,10 +1,11 @@
 package org.togetherjava.discord.server;
 
+import jdk.jshell.Diag;
 import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
-import org.apache.commons.lang3.StringUtils;
 import org.togetherjava.discord.server.execution.JShellSessionManager;
 import org.togetherjava.discord.server.execution.JShellWrapper;
+import org.togetherjava.discord.server.rendering.RendererManager;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
@@ -12,23 +13,21 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.MessageBuilder;
 
-import java.awt.Color;
-import java.util.Locale;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EventHandler {
     private static final Pattern CODE_BLOCK_EXTRACTOR_PATTERN = Pattern.compile("```(java)?\\s*([\\w\\W]+)```");
-    private static final Color ERROR_COLOR = new Color(255, 99, 71);
-    private static final Color SUCCESS_COLOR = new Color(118, 255, 0);
 
     private JShellSessionManager jShellSessionManager;
     private final String botPrefix;
+    private RendererManager rendererManager;
 
+    @SuppressWarnings("WeakerAccess")
     public EventHandler(Config config) {
         this.jShellSessionManager = new JShellSessionManager(config);
         this.botPrefix = config.getString("prefix");
+        this.rendererManager = new RendererManager();
     }
 
     @EventSubscriber
@@ -56,86 +55,42 @@ public class EventHandler {
     }
 
     private void executeCommand(IUser user, JShellWrapper shell, String command, IChannel channel) {
+        MessageBuilder messageBuilder = buildCommonMessage(channel);
+        EmbedBuilder embedBuilder;
         try {
             JShellWrapper.JShellResult results = shell.eval(command);
-            sendEvalResponse(results, shell, user, channel);
-        } catch (Throwable e) {
-            sendErrorResponse(user, channel, e);
-        }
-    }
 
-    private void sendEvalResponse(JShellWrapper.JShellResult result, JShellWrapper shell, IUser user, IChannel channel) {
-        for (SnippetEvent snippetEvent : result.getEvents()) {
-            MessageBuilder messageBuilder = new MessageBuilder(channel.getClient())
-                    .withChannel(channel);
+            SnippetEvent snippetEvent = results.getEvents().get(0);
 
-            EmbedBuilder snippetResponse = buildSnippetResponse(snippetEvent, shell, user);
+            embedBuilder = buildCommonEmbed(user, snippetEvent.snippet());
+            rendererManager.renderJShellResult(embedBuilder, results);
 
-            if (!result.getStdOut().isEmpty()) {
-                snippetResponse.appendField(
-                        "Output",
-                        StringUtils.truncate(result.getStdOut(), EmbedBuilder.FIELD_CONTENT_LIMIT),
-                        true
-                );
+            for (Diag diag : (Iterable<Diag>) shell.getSnippetDiagnostics(snippetEvent.snippet())::iterator) {
+                rendererManager.renderObject(embedBuilder, diag);
             }
 
-            messageBuilder.withEmbed(snippetResponse.build());
-
-            messageBuilder.send();
+        } catch (UnsupportedOperationException e) {
+            embedBuilder = buildCommonEmbed(user, null);
+            rendererManager.renderObject(embedBuilder, e);
+            messageBuilder.withEmbed(embedBuilder.build());
         }
+        messageBuilder.withEmbed(embedBuilder.build());
+        messageBuilder.send();
     }
 
-    private EmbedBuilder buildSnippetResponse(SnippetEvent snippetEvent, JShellWrapper shell, IUser user) {
-        Snippet snippet = snippetEvent.snippet();
-
+    private EmbedBuilder buildCommonEmbed(IUser user, Snippet snippet) {
         EmbedBuilder embedBuilder = new EmbedBuilder()
-                .withColor(SUCCESS_COLOR)
-                .withTitle(user.getName() + "'s Result")
-                .appendField("Snippet-ID", "$" + snippet.id(), true)
-                .appendField(
-                        "Value",
-                        "`" + Objects.toString(snippetEvent.value()) + "`",
-                        true
-                );
+                .withTitle(user.getName() + "'s Result");
 
-        if (snippetEvent.value() == null) {
-            shell.getSnippetDiagnostics(snippet).forEach(diag -> {
-                embedBuilder.appendField(
-                        "Error message",
-                        StringUtils.truncate(diag.getMessage(Locale.ENGLISH), EmbedBuilder.FIELD_CONTENT_LIMIT),
-                        true
-                );
-                embedBuilder.withColor(ERROR_COLOR);
-            });
-        }
-
-        if (snippetEvent.exception() != null) {
-            embedBuilder.appendField("Exception", snippetEvent.exception().getMessage(), true);
-            embedBuilder.withColor(ERROR_COLOR);
+        if (snippet != null) {
+            embedBuilder.appendField("Snippet-ID", "$" + snippet.id(), true);
         }
 
         return embedBuilder;
     }
 
-    private void sendErrorResponse(IUser user, IChannel channel, Throwable exception) {
-        MessageBuilder messageBuilder = new MessageBuilder(channel.getClient())
+    private MessageBuilder buildCommonMessage(IChannel channel) {
+        return new MessageBuilder(channel.getClient())
                 .withChannel(channel);
-
-        EmbedBuilder embedBuilder = new EmbedBuilder()
-                .withColor(ERROR_COLOR)
-                .withTitle(user.getName() + "'s Result");
-
-        embedBuilder.appendField("Type", exception.getClass().getSimpleName(), true);
-        embedBuilder.appendField("Message", "`" + exception.getMessage() + "`", true);
-
-        if (exception.getCause() != null) {
-            embedBuilder.appendField("Cause type", exception.getCause().getClass().getSimpleName(), true);
-            embedBuilder.appendField("Cause Message", "`" + exception.getCause().getMessage() + "`", true);
-        }
-
-        messageBuilder.withEmbed(embedBuilder.build());
-
-        messageBuilder.send();
-
     }
 }
