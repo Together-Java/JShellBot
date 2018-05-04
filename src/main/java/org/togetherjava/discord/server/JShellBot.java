@@ -6,6 +6,7 @@ import sx.blah.discord.api.IDiscordClient;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Properties;
 
 import static java.lang.System.exit;
 
@@ -29,20 +30,29 @@ public class JShellBot {
      */
     public void start() throws Exception {
         log.info("Goliath Online");
+        Config config;
         String botConfigPathString = System.getenv("JSHELL_BOT_CONFIG");
 
-        //if there is no path specified via env then use resources path
-        Path botConfigPath = botConfigPathString == null ? Paths.get(JShellBot.class.getResource("/bot.properties").toURI())
+        //if there is no path specified via env var then load from bot.properties in the resources path
+        Path botConfigPath = botConfigPathString == null ? null
                 : Paths.get(botConfigPathString);
 
-        Config config = new Config(botConfigPath);
+        if(botConfigPath == null){
+            Properties prop = new Properties();
+            prop.load(JShellBot.class.getResourceAsStream("/bot.properties"));
+            config = new Config(prop);
+        }
+        else{
+            config = new Config(botConfigPath);
+        }
+
         if(config.getString("token") != null){
             IDiscordClient client = BotUtils.buildDiscordClient(config.getString("token"));
             client.getDispatcher().registerListener(new EventHandler(config));
             client.login();
         }
         else{
-            log.error("Token not set or file not found in " + botConfigPath.toString());
+            log.error("Token not set or config file not found in");
             exit(1);
         }
 
