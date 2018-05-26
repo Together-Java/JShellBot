@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.togetherjava.discord.server.Config;
 import org.togetherjava.discord.server.io.StringOutputStream;
+import org.togetherjava.discord.server.sandbox.AgentAttacher;
 import org.togetherjava.discord.server.sandbox.FilteredExecutionControlProvider;
 import org.togetherjava.discord.server.sandbox.Sandbox;
 
@@ -43,6 +44,11 @@ public class JShellWrapper {
             return JShell.builder()
                     .out(out)
                     .err(out)
+                    .remoteVMOptions(
+                            AgentAttacher.getCommandLineArgument(),
+                            "-Djava.security.policy=="
+                                    + getClass().getResource("/jshell.policy").toExternalForm()
+                    )
                     .executionEngine(getExecutionControlProvider(config), Map.of())
                     .build();
         } catch (UnsupportedEncodingException e) {

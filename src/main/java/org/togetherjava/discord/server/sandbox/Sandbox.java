@@ -1,6 +1,9 @@
 package org.togetherjava.discord.server.sandbox;
 
-import java.security.*;
+import java.security.AccessControlContext;
+import java.security.PermissionCollection;
+import java.security.Permissions;
+import java.security.ProtectionDomain;
 import java.util.function.Supplier;
 
 public class Sandbox {
@@ -27,9 +30,10 @@ public class Sandbox {
      * @return the result of running it
      */
     public <T> T runInSandBox(Supplier<T> supplier) {
-        return AccessController.doPrivileged(
-                (PrivilegedAction<T>) supplier::get,
-                controlContext
-        );
+        return supplier.get();
+//        return AccessController.doPrivileged(
+//                (PrivilegedAction<T>) supplier::get,
+//                controlContext
+//        );
     }
 }

@@ -1,0 +1,5 @@
+// Restrict what Jshell can run
+grant {
+            permission java.util.RuntimePermission "accessDeclaredMembers";
+            permission java.util.RuntimePermission "accessClassInPackage";
+};

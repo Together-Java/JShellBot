@@ -16,12 +16,6 @@ public class JShellBot {
     static Logger log = LogManager.getLogger(JShellBot.class);
 
     public static void main(String[] args) {
-        System.setProperty(
-                "java.security.policy",
-                JShellBot.class.getResource("/grant_all.policy").toExternalForm()
-        );
-        System.setSecurityManager(new SecurityManager());
-
         JShellBot bot = new JShellBot();
         try {
             bot.start();
@@ -42,21 +36,19 @@ public class JShellBot {
         Path botConfigPath = botConfigPathString == null ? null
                 : Paths.get(botConfigPathString);
 
-        if(botConfigPath == null){
+        if (botConfigPath == null) {
             Properties prop = new Properties();
             prop.load(JShellBot.class.getResourceAsStream("/bot.properties"));
             config = new Config(prop);
-        }
-        else{
+        } else {
             config = new Config(botConfigPath);
         }
 
-        if(config.getString("token") != null){
+        if (config.getString("token") != null) {
             IDiscordClient client = BotUtils.buildDiscordClient(config.getString("token"));
             client.getDispatcher().registerListener(new EventHandler(config));
             client.login();
-        }
-        else{
+        } else {
             log.error("Token not set or config file not found in");
             exit(1);
         }

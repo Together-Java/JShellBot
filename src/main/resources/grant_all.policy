@@ -1,5 +1,0 @@
-// Everybody gets everything, as the jshell code runs in another security context. Therefore this *should* only apply
-// to our app and not user supplied code.
-grant {
-        permission java.security.AllPermission;
-};
