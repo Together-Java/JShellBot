@@ -16,6 +16,12 @@ public class JShellBot {
     static Logger log = LogManager.getLogger(JShellBot.class);
 
     public static void main(String[] args) {
+        System.setProperty(
+                "java.security.policy",
+                JShellBot.class.getResource("/grant_all.policy").toExternalForm()
+        );
+        System.setSecurityManager(new SecurityManager());
+
         JShellBot bot = new JShellBot();
         try {
             bot.start();
@@ -25,7 +31,6 @@ public class JShellBot {
     }
 
     /**
-     *
      * @throws Exception
      */
     public void start() throws Exception {

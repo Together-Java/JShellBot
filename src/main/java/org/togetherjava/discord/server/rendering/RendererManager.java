@@ -19,6 +19,7 @@ public class RendererManager {
         addRenderer(new ExceptionRenderer());
         addRenderer(new StandardOutputRenderer());
         addRenderer(new CompilationErrorRenderer());
+        addRenderer(new RejectedColorRenderer());
     }
 
     /**
