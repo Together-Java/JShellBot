@@ -1,6 +1,7 @@
 package org.togetherjava.discord.server.rendering;
 
 import jdk.jshell.Snippet;
+import jdk.jshell.SnippetEvent;
 import org.togetherjava.discord.server.execution.JShellWrapper;
 import sx.blah.discord.util.EmbedBuilder;
 
@@ -14,8 +15,15 @@ public class RejectedColorRenderer implements Renderer {
     public EmbedBuilder render(Object object, EmbedBuilder builder) {
         JShellWrapper.JShellResult result = (JShellWrapper.JShellResult) object;
 
-        if (result.getEvents().stream().anyMatch(e -> e.status() == Snippet.Status.REJECTED)) {
-            RenderUtils.applyFailColor(builder);
+        for (SnippetEvent snippetEvent : result.getEvents()) {
+            if (snippetEvent.status() != Snippet.Status.VALID) {
+                RenderUtils.applyFailColor(builder);
+                break;
+            }
+            if (snippetEvent.exception() != null) {
+                RenderUtils.applyFailColor(builder);
+                break;
+            }
         }
 
         return builder;
