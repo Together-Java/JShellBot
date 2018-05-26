@@ -11,7 +11,6 @@ import org.togetherjava.discord.server.Config;
 import org.togetherjava.discord.server.io.StringOutputStream;
 import org.togetherjava.discord.server.sandbox.AgentAttacher;
 import org.togetherjava.discord.server.sandbox.FilteredExecutionControlProvider;
-import org.togetherjava.discord.server.sandbox.Sandbox;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -28,14 +27,12 @@ public class JShellWrapper {
 
     private JShell jShell;
     private StringOutputStream outputStream;
-    private Sandbox sandbox;
     private TimeWatchdog watchdog;
 
     public JShellWrapper(Config config, TimeWatchdog watchdog) {
         this.watchdog = watchdog;
         this.outputStream = new StringOutputStream(Character.BYTES * 1600);
         this.jShell = buildJShell(outputStream, config);
-        this.sandbox = new Sandbox();
     }
 
     private JShell buildJShell(OutputStream outputStream, Config config) {
@@ -110,7 +107,7 @@ public class JShellWrapper {
     }
 
     private List<SnippetEvent> evaluate(String command) {
-        return sandbox.runInSandBox(() -> jShell.eval(command));
+        return jShell.eval(command);
     }
 
     private String getStandardOut() {
