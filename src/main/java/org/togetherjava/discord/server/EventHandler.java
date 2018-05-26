@@ -5,6 +5,7 @@ import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
 import org.togetherjava.discord.server.execution.JShellSessionManager;
 import org.togetherjava.discord.server.execution.JShellWrapper;
+import org.togetherjava.discord.server.io.input.InputSanitizerManager;
 import org.togetherjava.discord.server.rendering.RendererManager;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -22,12 +23,14 @@ public class EventHandler {
     private JShellSessionManager jShellSessionManager;
     private final String botPrefix;
     private RendererManager rendererManager;
+    private InputSanitizerManager sanitizerManager;
 
     @SuppressWarnings("WeakerAccess")
     public EventHandler(Config config) {
         this.jShellSessionManager = new JShellSessionManager(config);
         this.botPrefix = config.getString("prefix");
         this.rendererManager = new RendererManager();
+        this.sanitizerManager = new InputSanitizerManager();
     }
 
     @EventSubscriber
@@ -51,7 +54,7 @@ public class EventHandler {
             return codeBlockMatcher.group(2);
         }
 
-        return withoutPrefix;
+        return sanitizerManager.sanitize(withoutPrefix);
     }
 
     private void executeCommand(IUser user, JShellWrapper shell, String command, IChannel channel) {
