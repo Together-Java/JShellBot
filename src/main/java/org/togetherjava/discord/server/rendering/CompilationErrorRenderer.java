@@ -13,8 +13,6 @@ public class CompilationErrorRenderer implements Renderer {
 
     @Override
     public EmbedBuilder render(Object object, EmbedBuilder builder) {
-        RenderUtils.applyFailColor(builder);
-
         Diag diag = (Diag) object;
         return builder
                 .appendField("Is compilation error", String.valueOf(diag.isError()), true)
