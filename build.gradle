@@ -25,9 +25,6 @@ task fatJar(type: Jar) {
 }
 
 
-test {
-    useJUnitPlatform()
-}
 
 repositories {
     mavenCentral()
@@ -39,7 +36,6 @@ repositories {
 
 dependencies {
     def junitVersion = '5.1.1'
-
     // https://mvnrepository.com/artifact/commons-daemon/commons-daemon
     compile group: 'commons-daemon', name: 'commons-daemon', version: '1.1.0'
     // Discord4J from Jitpack
@@ -56,7 +52,7 @@ dependencies {
     // todo once we fix the logging properties set this to compile
     testCompile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
 
-    implementation 'com.github.I-Al-Istannen:JvmAgentUtils:de8d42398b'
+    compile 'com.github.I-Al-Istannen:JvmAgentUtils:de8d42398b'
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
