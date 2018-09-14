@@ -1,7 +1,7 @@
 package org.togetherjava.discord.server.io;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public class StringOutputStream extends OutputStream {
 
-    private static final Logger LOGGER = LogManager.getLogger(StringOutputStream.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StringOutputStream.class);
 
     private static final int INITIAL_BUFFER_SIZE = 64;
 

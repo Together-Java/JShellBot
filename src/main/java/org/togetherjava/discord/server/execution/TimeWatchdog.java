@@ -1,7 +1,7 @@
 package org.togetherjava.discord.server.execution;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  */
 public class TimeWatchdog {
 
-    private static final Logger LOGGER = LogManager.getLogger(TimeWatchdog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimeWatchdog.class);
 
     private final ScheduledExecutorService watchdogThreadPool;
     private final Duration maxTime;

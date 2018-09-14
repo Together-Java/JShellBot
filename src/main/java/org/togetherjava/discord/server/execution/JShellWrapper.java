@@ -5,8 +5,8 @@ import jdk.jshell.JShell;
 import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.togetherjava.discord.server.Config;
 import org.togetherjava.discord.server.io.StringOutputStream;
 import org.togetherjava.discord.server.sandbox.AgentAttacher;
@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 
 public class JShellWrapper {
 
-    private static final Logger LOGGER = LogManager.getLogger(JShellWrapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JShellWrapper.class);
 
     private JShell jShell;
     private StringOutputStream outputStream;

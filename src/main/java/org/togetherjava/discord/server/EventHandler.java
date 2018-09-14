@@ -35,6 +35,7 @@ public class EventHandler {
 
     @EventSubscriber
     public void onMessageReceived(MessageReceivedEvent event) {
+        System.out.println("Gotcha");
         String message = event.getMessage().getContent();
         if (message.startsWith(botPrefix)) {
             String command = parseCommandFromMessage(message);
