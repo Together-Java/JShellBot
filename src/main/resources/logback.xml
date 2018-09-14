@@ -4,39 +4,37 @@
 <!-- Put this file under src/main/resources folder -->
 
 <configuration scan="true">
-    <!-- Avoid logger spam from web socket -->
-    <logger name="org.eclipse.jetty" level="INFO"/>
-    <!-- Configure Discord4J logger level -->
-    <logger name="sx.blah.discord.Discord4J" level="DEBUG"/>
-    <!-- Configure my logging level -->
-    <logger name="org.togetherjava.discord.server.JShellBot" level="DEBUG"/>
+  <!-- Configure Discord4J logger level -->
+  <logger name="sx.blah.discord.Discord4J" level="DEBUG"/>
+  <!-- Configure my logging level -->
+  <logger name="org.togetherjava.discord.server.JShellBot" level="DEBUG"/>
 
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/bot.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>90</maxHistory>
-        </rollingPolicy>
-        <encoder>
-            <charset>UTF-8</charset>
-            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-40.40logger{39} : %msg%n</Pattern>
-        </encoder>
-        <prudent>true</prudent>
-    </appender>
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/bot.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>90</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <charset>UTF-8</charset>
+      <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-40.40logger{39} : %msg%n</Pattern>
+    </encoder>
+    <prudent>true</prudent>
+  </appender>
 
-    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-        <queueSize>512</queueSize>
-        <appender-ref ref="FILE"/>
-    </appender>
+  <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>512</queueSize>
+    <appender-ref ref="FILE"/>
+  </appender>
 
-    <root level="debug">
-        <appender-ref ref="CONSOLE"/>
-        <!-- Uncomment the next line to also log to a file -->
-        <!-- <appender-ref ref="ASYNC"/> -->
-    </root>
+  <root level="debug">
+    <appender-ref ref="CONSOLE"/>
+    <!-- Uncomment the next line to also log to a file -->
+    <!-- <appender-ref ref="ASYNC"/> -->
+  </root>
 </configuration>
