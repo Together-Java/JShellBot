@@ -77,7 +77,7 @@ public class CommandHandler extends ListenerAdapter {
         rendererManager.renderObject(embedBuilder, diag);
       }
 
-    } catch (UnsupportedOperationException e) {
+    } catch (UnsupportedOperationException | AllottedTimeExceededException e) {
       embedBuilder = buildCommonEmbed(user, null);
       rendererManager.renderObject(embedBuilder, e);
       messageBuilder.setEmbed(embedBuilder.build());
