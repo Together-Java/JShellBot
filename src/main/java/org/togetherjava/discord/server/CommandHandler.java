@@ -1,5 +1,7 @@
 package org.togetherjava.discord.server;
 
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jdk.jshell.Diag;
@@ -25,12 +27,16 @@ public class CommandHandler extends ListenerAdapter {
   private JShellSessionManager jShellSessionManager;
   private final String botPrefix;
   private RendererManager rendererManager;
+  private boolean autoDeleteMessages;
+  private Duration autoDeleteMessageDuration;
 
   @SuppressWarnings("WeakerAccess")
   public CommandHandler(Config config) {
     this.jShellSessionManager = new JShellSessionManager(config);
     this.botPrefix = config.getString("prefix");
     this.rendererManager = new RendererManager();
+    this.autoDeleteMessages = config.getBoolean("messages.auto_delete");
+    this.autoDeleteMessageDuration = config.getDuration("messages.auto_delete.duration");
   }
 
   @Override
@@ -84,7 +90,11 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     messageBuilder.setEmbed(embedBuilder.build());
-    messageBuilder.sendTo(channel).submit();
+    messageBuilder.sendTo(channel).submit().thenAccept(message -> {
+      if (autoDeleteMessages) {
+        message.delete().queueAfter(autoDeleteMessageDuration.toMillis(), TimeUnit.MILLISECONDS);
+      }
+    });
   }
 
   private EmbedBuilder buildCommonEmbed(User user, Snippet snippet) {

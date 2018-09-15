@@ -44,8 +44,6 @@ public class Config {
     // close the stream
     try (stream) {
       properties.load(stream);
-    } catch (IOException e) {
-      throw e;
     }
   }
 
@@ -82,5 +80,16 @@ public class Config {
   public List<String> getCommaSeparatedList(String key) {
     String value = getString(key);
     return value == null ? Collections.emptyList() : Arrays.asList(value.split(","));
+  }
+
+  /**
+   * Tries to parse an entry as a boolean
+   *
+   * @param key the key to look up
+   * @return the boolean under the key or null if the key was not specified
+   */
+  public Boolean getBoolean(String key) {
+    String string = getString(key);
+    return string == null ? null : Boolean.parseBoolean(string);
   }
 }
