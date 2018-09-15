@@ -13,8 +13,12 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FilteredExecutionControl extends LocalExecutionControl {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(FilteredExecutionControl.class);
 
   private final List<Pair<String, Pattern>> blockedMethods;
   private final List<Pattern> blockedPackages;
@@ -152,7 +156,7 @@ public class FilteredExecutionControl extends LocalExecutionControl {
     public void visitInvokeDynamicInsn(String name, String descriptor, Handle bootstrapMethodHandle,
         Object... bootstrapMethodArguments) {
       // TODO: 04.04.18 Implement this method
-      System.out.println("Calling dymn " + name + " " + descriptor + " " + bootstrapMethodHandle);
+      LOGGER.warn("Calling dymn " + name + " " + descriptor + " " + bootstrapMethodHandle);
     }
   }
 }

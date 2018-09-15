@@ -1,29 +1,24 @@
 package org.togetherjava.discord.server.execution;
 
-import jdk.jshell.Diag;
-import jdk.jshell.JShell;
-import jdk.jshell.Snippet;
-import jdk.jshell.SnippetEvent;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.togetherjava.discord.server.Config;
-import org.togetherjava.discord.server.io.StringOutputStream;
-import org.togetherjava.discord.server.sandbox.AgentAttacher;
-import org.togetherjava.discord.server.sandbox.FilteredExecutionControlProvider;
-
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import jdk.jshell.Diag;
+import jdk.jshell.JShell;
+import jdk.jshell.Snippet;
+import jdk.jshell.SnippetEvent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.togetherjava.discord.server.Config;
+import org.togetherjava.discord.server.io.StringOutputStream;
+import org.togetherjava.discord.server.sandbox.AgentAttacher;
+import org.togetherjava.discord.server.sandbox.FilteredExecutionControlProvider;
 
 public class JShellWrapper {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(JShellWrapper.class);
 
   private JShell jShell;
   private StringOutputStream outputStream;
@@ -36,23 +31,17 @@ public class JShellWrapper {
   }
 
   private JShell buildJShell(OutputStream outputStream, Config config) {
-    try {
-      PrintStream out = new PrintStream(outputStream, true, "UTF-8");
-      return JShell.builder()
-          .out(out)
-          .err(out)
-          .remoteVMOptions(
-              AgentAttacher.getCommandLineArgument(),
-              "-Djava.security.policy=="
-                  + getClass().getResource("/jshell.policy").toExternalForm()
-          )
-          .executionEngine(getExecutionControlProvider(config), Map.of())
-          .build();
-    } catch (UnsupportedEncodingException e) {
-      LOGGER.warn("Unsupported encoding: UTF-8. How?", e);
-
-      return JShell.create();
-    }
+    PrintStream out = new PrintStream(outputStream, true, StandardCharsets.UTF_8);
+    return JShell.builder()
+        .out(out)
+        .err(out)
+        .remoteVMOptions(
+            AgentAttacher.getCommandLineArgument(),
+            "-Djava.security.policy=="
+                + getClass().getResource("/jshell.policy").toExternalForm()
+        )
+        .executionEngine(getExecutionControlProvider(config), Map.of())
+        .build();
   }
 
   private FilteredExecutionControlProvider getExecutionControlProvider(Config config) {

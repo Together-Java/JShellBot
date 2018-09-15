@@ -2,14 +2,10 @@ package org.togetherjava.discord.server.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class StringOutputStream extends OutputStream {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(StringOutputStream.class);
 
   private static final int INITIAL_BUFFER_SIZE = 64;
 
@@ -58,12 +54,6 @@ public class StringOutputStream extends OutputStream {
       return "";
     }
 
-    try {
-      return new String(Arrays.copyOf(buffer, size), "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      LOGGER.warn("Unknown encoding: UTF-8. How?", e);
-
-      return "";
-    }
+    return new String(Arrays.copyOf(buffer, size), StandardCharsets.UTF_8);
   }
 }
