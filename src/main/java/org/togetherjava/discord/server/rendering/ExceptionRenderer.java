@@ -12,6 +12,8 @@ public class ExceptionRenderer implements Renderer {
 
   @Override
   public EmbedBuilder render(Object object, EmbedBuilder builder) {
+    RenderUtils.applyFailColor(builder);
+
     Throwable throwable = (Throwable) object;
     builder
         .addField("Exception type", throwable.getClass().getSimpleName(), true)
