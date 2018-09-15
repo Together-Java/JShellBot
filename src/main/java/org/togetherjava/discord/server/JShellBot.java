@@ -43,13 +43,13 @@ public class JShellBot {
     if (config.getString("token") != null) {
       JDA jda = new JDABuilder(AccountType.BOT)
           .setToken(config.getString("token"))
-          .addEventListener(new EventHandler(config))
+          .addEventListener(new CommandHandler(config))
           .build();
       jda.awaitReady();
 
       LOGGER.info("Goliath Online");
     } else {
-      LOGGER.error("Token not set or config file not found in");
+      LOGGER.error("Token not set or config file not found in '" + botConfigPathString + "'");
       System.exit(1);
     }
   }

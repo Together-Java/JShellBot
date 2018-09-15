@@ -8,7 +8,7 @@ public class JshellSecurityManager extends SecurityManager {
   @Override
   public void checkPermission(Permission perm) {
     // allow all but Jshell to bypass this
-    if (!comesFromMe() && comesFromJshell()) {
+    if (!comesFromBotCode() && comesFromJshell()) {
       super.checkPermission(perm);
     }
   }
@@ -18,7 +18,7 @@ public class JshellSecurityManager extends SecurityManager {
         .anyMatch(aClass -> aClass.getName().contains("REPL"));
   }
 
-  private boolean comesFromMe() {
+  private boolean comesFromBotCode() {
     return Arrays.stream(getClassContext())
         .skip(2)
         .anyMatch(aClass -> aClass == getClassContext()[0]);

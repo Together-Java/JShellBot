@@ -11,12 +11,13 @@ import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import org.togetherjava.discord.server.execution.AllottedTimeExceededException;
 import org.togetherjava.discord.server.execution.JShellSessionManager;
 import org.togetherjava.discord.server.execution.JShellWrapper;
 import org.togetherjava.discord.server.io.input.InputSanitizerManager;
 import org.togetherjava.discord.server.rendering.RendererManager;
 
-public class EventHandler extends ListenerAdapter {
+public class CommandHandler extends ListenerAdapter {
 
   private static final Pattern CODE_BLOCK_EXTRACTOR_PATTERN = Pattern
       .compile("```(java)?\\s*([\\w\\W]+)```");
@@ -26,7 +27,7 @@ public class EventHandler extends ListenerAdapter {
   private RendererManager rendererManager;
 
   @SuppressWarnings("WeakerAccess")
-  public EventHandler(Config config) {
+  public CommandHandler(Config config) {
     this.jShellSessionManager = new JShellSessionManager(config);
     this.botPrefix = config.getString("prefix");
     this.rendererManager = new RendererManager();
@@ -35,9 +36,11 @@ public class EventHandler extends ListenerAdapter {
   @Override
   public void onMessageReceived(MessageReceivedEvent event) {
     String message = event.getMessage().getContentRaw();
+
     if (message.startsWith(botPrefix)) {
       String command = parseCommandFromMessage(message);
       String authorID = event.getAuthor().getId();
+
       JShellWrapper shell = jShellSessionManager.getSessionOrCreate(authorID);
 
       executeCommand(event.getAuthor(), shell, command, event.getTextChannel());
@@ -60,16 +63,17 @@ public class EventHandler extends ListenerAdapter {
       MessageChannel channel) {
     MessageBuilder messageBuilder = new MessageBuilder();
     EmbedBuilder embedBuilder;
-    try {
-      JShellWrapper.JShellResult results = shell.eval(command);
 
-      SnippetEvent snippetEvent = results.getEvents().get(0);
+    try {
+      JShellWrapper.JShellResult result = shell.eval(command);
+      SnippetEvent snippetEvent = result.getEvents().get(0);
 
       embedBuilder = buildCommonEmbed(user, snippetEvent.snippet());
-      rendererManager.renderJShellResult(embedBuilder, results);
 
-      for (Diag diag : (Iterable<Diag>) shell
-          .getSnippetDiagnostics(snippetEvent.snippet())::iterator) {
+      rendererManager.renderJShellResult(embedBuilder, result);
+
+      Iterable<Diag> diagonstics = shell.getSnippetDiagnostics(snippetEvent.snippet())::iterator;
+      for (Diag diag : diagonstics) {
         rendererManager.renderObject(embedBuilder, diag);
       }
 
@@ -78,6 +82,7 @@ public class EventHandler extends ListenerAdapter {
       rendererManager.renderObject(embedBuilder, e);
       messageBuilder.setEmbed(embedBuilder.build());
     }
+
     messageBuilder.setEmbed(embedBuilder.build());
     messageBuilder.sendTo(channel).submit();
   }

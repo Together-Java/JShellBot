@@ -16,7 +16,6 @@ public class CompilationErrorRenderer implements Renderer {
   public EmbedBuilder render(Object object, EmbedBuilder builder) {
     Diag diag = (Diag) object;
     return builder
-        .addField("Is compilation error", String.valueOf(diag.isError()), true)
         .addField(
             "Error message",
             RenderUtils
