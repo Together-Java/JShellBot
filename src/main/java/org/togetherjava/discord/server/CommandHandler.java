@@ -29,6 +29,7 @@ public class CommandHandler extends ListenerAdapter {
   private RendererManager rendererManager;
   private boolean autoDeleteMessages;
   private Duration autoDeleteMessageDuration;
+  private InputSanitizerManager inputSanitizerManager;
 
   @SuppressWarnings("WeakerAccess")
   public CommandHandler(Config config) {
@@ -37,6 +38,7 @@ public class CommandHandler extends ListenerAdapter {
     this.rendererManager = new RendererManager();
     this.autoDeleteMessages = config.getBoolean("messages.auto_delete");
     this.autoDeleteMessageDuration = config.getDuration("messages.auto_delete.duration");
+    this.inputSanitizerManager = new InputSanitizerManager();
   }
 
   @Override
@@ -62,7 +64,7 @@ public class CommandHandler extends ListenerAdapter {
       return codeBlockMatcher.group(2);
     }
 
-    return withoutPrefix;
+    return inputSanitizerManager.sanitize(withoutPrefix);
   }
 
   private void executeCommand(User user, JShellWrapper shell, String command,
