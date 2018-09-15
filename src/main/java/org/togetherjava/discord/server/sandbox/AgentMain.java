@@ -2,7 +2,6 @@ package org.togetherjava.discord.server.sandbox;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
-import org.togetherjava.discord.server.JshellSecurityManager;
 
 /**
  * An agent that sets the security manager JShell uses.

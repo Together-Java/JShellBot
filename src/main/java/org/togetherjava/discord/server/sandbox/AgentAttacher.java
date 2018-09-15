@@ -2,7 +2,6 @@ package org.togetherjava.discord.server.sandbox;
 
 import java.nio.file.Path;
 import me.ialistannen.jvmagentutils.instrumentation.JvmUtils;
-import org.togetherjava.discord.server.JshellSecurityManager;
 
 public class AgentAttacher {
 

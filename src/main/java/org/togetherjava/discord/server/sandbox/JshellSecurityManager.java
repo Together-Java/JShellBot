@@ -1,4 +1,4 @@
-package org.togetherjava.discord.server;
+package org.togetherjava.discord.server.sandbox;
 
 import java.lang.reflect.ReflectPermission;
 import java.security.Permission;
