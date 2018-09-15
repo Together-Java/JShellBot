@@ -1,16 +1,15 @@
 package org.togetherjava.discord.server;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Properties;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-//todo convert to server daemen
 public class JShellBot {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JShellBot.class);
@@ -20,37 +19,45 @@ public class JShellBot {
     try {
       bot.start();
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.error("Error starting the bot: ", e);
+      System.exit(3);
     }
   }
 
   private void start() throws Exception {
-    Config config;
-    String botConfigPathString = System.getenv("JSHELL_BOT_CONFIG");
+    Config config = getConfig();
 
-    //if there is no path specified via env var then load from bot.properties in the resources path
-    Path botConfigPath = botConfigPathString == null ? null
-        : Paths.get(botConfigPathString);
+    if (config.getString("token") == null) {
+      LOGGER.error("Token not set in config. Please add it under the `token` key.");
+      System.exit(2);
+    }
+
+    JDA jda = new JDABuilder(AccountType.BOT)
+        .setToken(config.getString("token"))
+        .addEventListener(new CommandHandler(config))
+        .build();
+    jda.awaitReady();
+
+    LOGGER.info("Goliath Online");
+  }
+
+  private Config getConfig() throws IOException {
+    String botConfigPath = System.getenv("JSHELL_BOT_CONFIG");
 
     if (botConfigPath == null) {
-      Properties prop = new Properties();
-      prop.load(JShellBot.class.getResourceAsStream("/bot.properties"));
-      config = new Config(prop);
-    } else {
-      config = new Config(botConfigPath);
+      botConfigPath = "bot.properties";
     }
 
-    if (config.getString("token") != null) {
-      JDA jda = new JDABuilder(AccountType.BOT)
-          .setToken(config.getString("token"))
-          .addEventListener(new CommandHandler(config))
-          .build();
-      jda.awaitReady();
+    Path path = Paths.get(botConfigPath);
 
-      LOGGER.info("Goliath Online");
-    } else {
-      LOGGER.error("Token not set or config file not found in '" + botConfigPathString + "'");
+    if (Files.notExists(path)) {
+      LOGGER.error(
+          "No config given. Please set the 'JSHELL_BOT_CONFIG' environment variable"
+              + " or provide a 'bot.properties' file in the same directory as this jar file"
+      );
       System.exit(1);
     }
+
+    return new Config(path);
   }
 }
