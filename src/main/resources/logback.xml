@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- This file is not essential but helps to get you used to logback -->
-<!-- Put this file under src/main/resources folder -->
-
 <configuration scan="true">
-  <!-- Configure Discord4J logger level -->
-  <logger name="sx.blah.discord.Discord4J" level="DEBUG"/>
   <!-- Configure my logging level -->
   <logger name="org.togetherjava.discord.server.JShellBot" level="DEBUG"/>
 
@@ -34,7 +29,5 @@
 
   <root level="debug">
     <appender-ref ref="CONSOLE"/>
-    <!-- Uncomment the next line to also log to a file -->
-    <!-- <appender-ref ref="ASYNC"/> -->
   </root>
 </configuration>
