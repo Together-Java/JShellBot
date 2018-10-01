@@ -1,7 +1,5 @@
 package org.togetherjava.discord.server.sandbox;
 
-import org.togetherjava.discord.server.JshellSecurityManager;
-
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 
@@ -10,7 +8,7 @@ import java.lang.instrument.Instrumentation;
  */
 public class AgentMain implements ClassFileTransformer {
 
-    public static void premain(String args, Instrumentation inst) {
-        System.setSecurityManager(new JshellSecurityManager());
-    }
+  public static void premain(String args, Instrumentation inst) {
+    System.setSecurityManager(new JshellSecurityManager());
+  }
 }

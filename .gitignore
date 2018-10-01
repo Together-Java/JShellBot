@@ -3,4 +3,8 @@ out/
 gradle/
 .idea/
 .gradle/
-src/main/resources/bot.properties
+target/
+build/
+/bot.properties
+logs/
+*.iml

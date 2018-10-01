@@ -1,70 +1,59 @@
 package org.togetherjava.discord.server.io;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class StringOutputStream extends OutputStream {
 
-    private static final Logger LOGGER = LogManager.getLogger(StringOutputStream.class);
+  private static final int INITIAL_BUFFER_SIZE = 64;
 
-    private static final int INITIAL_BUFFER_SIZE = 64;
+  private final int maxSize;
+  private byte[] buffer;
+  private int size;
 
-    private final int maxSize;
-    private byte[] buffer;
-    private int size;
+  public StringOutputStream(int maxSize) {
+    this.maxSize = maxSize;
 
-    public StringOutputStream(int maxSize) {
-        this.maxSize = maxSize;
+    reset();
+  }
 
-        reset();
+  /**
+   * Resets this {@link StringOutputStream}, also discarding the buffer.
+   */
+  public void reset() {
+    buffer = new byte[INITIAL_BUFFER_SIZE];
+    size = 0;
+  }
+
+  @Override
+  public void write(int b) throws IOException {
+    ensureCapacity();
+
+    if (size < buffer.length && size < maxSize) {
+      buffer[size++] = (byte) b;
+    }
+  }
+
+  private void ensureCapacity() {
+    if (size >= buffer.length) {
+      int newSize = size * 2;
+
+      if (newSize > maxSize) {
+        newSize = maxSize;
+      }
+
+      buffer = Arrays.copyOf(buffer, newSize);
+    }
+  }
+
+  @Override
+  public String toString() {
+    if (size < 1) {
+      return "";
     }
 
-    /**
-     * Resets this {@link StringOutputStream}, also discarding the buffer.
-     */
-    public void reset() {
-        buffer = new byte[INITIAL_BUFFER_SIZE];
-        size = 0;
-    }
-
-    @Override
-    public void write(int b) throws IOException {
-        ensureCapacity();
-
-        if (size < buffer.length && size < maxSize) {
-            buffer[size++] = (byte) b;
-        }
-    }
-
-    private void ensureCapacity() {
-        if (size >= buffer.length) {
-            int newSize = size * 2;
-
-            if (newSize > maxSize) {
-                newSize = maxSize;
-            }
-
-            buffer = Arrays.copyOf(buffer, newSize);
-        }
-    }
-
-    @Override
-    public String toString() {
-        if (size < 1) {
-            return "";
-        }
-
-        try {
-            return new String(Arrays.copyOf(buffer, size), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("Unknown encoding: UTF-8. How?", e);
-
-            return "";
-        }
-    }
+    return new String(Arrays.copyOf(buffer, size), StandardCharsets.UTF_8);
+  }
 }
