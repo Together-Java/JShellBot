@@ -58,6 +58,17 @@ public class Config {
   }
 
   /**
+   * Returns a property from the config as a String.
+   *
+   * @param key the key
+   * @param defaultValue the default value to use when the key does not exist
+   * @return the property or null if not found
+   */
+  public String getStringOrDefault(String key, String defaultValue) {
+    return properties.getProperty(key, defaultValue);
+  }
+
+  /**
    * Tries to parse an entry in ISO-8601 duration format.
    *
    * @param key the key to look up

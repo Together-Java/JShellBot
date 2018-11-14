@@ -27,7 +27,11 @@ public class JShellWrapper {
   public JShellWrapper(Config config, TimeWatchdog watchdog) {
     this.watchdog = watchdog;
     this.outputStream = new StringOutputStream(Character.BYTES * 1600);
+
     this.jShell = buildJShell(outputStream, config);
+
+    // Initialize JShell using the startup command
+    jShell.eval(config.getStringOrDefault("java.startup-command", ""));
   }
 
   private JShell buildJShell(OutputStream outputStream, Config config) {
