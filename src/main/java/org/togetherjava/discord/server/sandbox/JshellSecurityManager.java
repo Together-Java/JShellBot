@@ -1,6 +1,5 @@
 package org.togetherjava.discord.server.sandbox;
 
-import java.lang.reflect.ReflectPermission;
 import java.security.Permission;
 import java.util.Arrays;
 
@@ -8,11 +7,18 @@ public class JshellSecurityManager extends SecurityManager {
 
   @Override
   public void checkPermission(Permission perm) {
+    if (!comesFromBotCode()) {
+      return;
+    }
+
+    // lambda init call
+    if (containsClass("java.lang.invoke.CallSite")) {
+      return;
+    }
+
     // allow all but Jshell to bypass this
-    if (!comesFromBotCode() && comesFromJshell()) {
-      if (!isLambdaReflectCall(perm)) {
-        super.checkPermission(perm);
-      }
+    if (comesFromJshell()) {
+      super.checkPermission(perm);
     }
   }
 
@@ -27,20 +33,12 @@ public class JshellSecurityManager extends SecurityManager {
         .anyMatch(aClass -> aClass == getClassContext()[0]);
   }
 
-  private boolean isLambdaReflectCall(Permission permission) {
-    return permission instanceof ReflectPermission
-        && permission.getName().equals("suppressAccessChecks")
-        && comesFromLambdaCallsite();
-  }
-
-  /**
-   * Allow lambdas to run properly. Likely also disables the check for code running <em>inside</em>
-   * the lambda, which means we have to rely on the bytecode inspection to secure that.
-   *
-   * @return true if a lambda call site is involved
-   */
-  private boolean comesFromLambdaCallsite() {
-    return Arrays.stream(getClassContext())
-        .anyMatch(aClass -> aClass.getName().equals("java.lang.invoke.LambdaMetafactory"));
+  private boolean containsClass(String name) {
+    for (Class<?> aClass : getClassContext()) {
+      if (aClass.getName().equals(name)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
