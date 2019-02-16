@@ -127,6 +127,21 @@ class JShellWrapperTest {
     );
   }
 
+  @Test
+  void blocksResettingSecurityManager() {
+    JShellResult result = wrapper
+        .eval("System.setSecurityManager(null)");
+
+    if (!allFailed(result)) {
+      printSnippetResult(result);
+    }
+
+    assertTrue(
+        allFailed(result),
+        "Not all snippets were rejected when resetting the security manager."
+    );
+  }
+
   private boolean allFailed(JShellResult result) {
     return result.getEvents().stream()
         .allMatch(snippetEvent ->
