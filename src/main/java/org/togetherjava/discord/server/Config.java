@@ -19,8 +19,8 @@ public class Config {
   /**
    * Reads the default config and populates this object with it
    *
-   * @param configPath the path to the config to read. Null or a non-existent path to only use the
-   * defaults
+   * @param configPath the path to the config to read. Null or a non-existent path to only use
+   *     the defaults
    * @throws IOException if an error occurs reading the config
    */
   public Config(Path configPath) throws IOException {
@@ -94,13 +94,34 @@ public class Config {
   }
 
   /**
-   * Tries to parse an entry as a boolean
+   * Tries to parse an entry as a boolean.
    *
    * @param key the key to look up
    * @return the boolean under the key or null if the key was not specified
    */
-  public Boolean getBoolean(String key) {
+  public boolean getBoolean(String key) {
     String string = getString(key);
-    return string == null ? null : Boolean.parseBoolean(string);
+
+    if (string == null) {
+      throw new RuntimeException("Expected a boolean in the config at path: '" + key + "'");
+    }
+
+    return Boolean.parseBoolean(string);
+  }
+
+  /**
+   * Tries to parse an entry as an int.
+   *
+   * @param key the key to look up
+   * @return the int under the key or null if the key was not specified
+   */
+  public int getInt(String key) {
+    String string = getString(key);
+
+    if (string == null) {
+      throw new RuntimeException("Expected an int in the config at path: '" + key + "'");
+    }
+
+    return Integer.parseInt(string);
   }
 }
