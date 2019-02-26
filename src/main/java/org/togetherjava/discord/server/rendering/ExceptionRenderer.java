@@ -1,5 +1,6 @@
 package org.togetherjava.discord.server.rendering;
 
+import java.util.Objects;
 import jdk.jshell.EvalException;
 import net.dv8tion.jda.core.EmbedBuilder;
 
@@ -20,7 +21,7 @@ public class ExceptionRenderer implements Renderer {
     Throwable throwable = (Throwable) object;
     builder
         .addField("Exception type", throwable.getClass().getSimpleName(), true)
-        .addField("Message", throwable.getMessage(), false);
+        .addField("Message", Objects.toString(throwable.getMessage()), false);
 
     if (throwable.getCause() != null) {
       renderCause(1, throwable, builder);
