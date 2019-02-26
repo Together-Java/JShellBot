@@ -2,6 +2,7 @@ package org.togetherjava.discord.server.rendering;
 
 import java.util.ArrayList;
 import java.util.List;
+import jdk.jshell.Snippet.Status;
 import jdk.jshell.SnippetEvent;
 import net.dv8tion.jda.core.EmbedBuilder;
 import org.togetherjava.discord.server.execution.JShellWrapper;
@@ -41,7 +42,7 @@ public class RendererManager {
    *     to render
    */
   public void renderJShellResult(EmbedBuilder builder, JShellWrapper.JShellResult result) {
-    RenderUtils.applySuccessColor(builder);
+    RenderUtils.applyColor(Status.VALID, builder);
 
     renderObject(builder, result);
 

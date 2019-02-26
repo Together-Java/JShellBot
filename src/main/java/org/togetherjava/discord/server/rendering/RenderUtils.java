@@ -2,6 +2,7 @@ package org.togetherjava.discord.server.rendering;
 
 
 import java.awt.Color;
+import jdk.jshell.Snippet;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 /**
@@ -13,6 +14,8 @@ class RenderUtils {
 
   private static final Color ERROR_COLOR = new Color(255, 99, 71);
   private static final Color SUCCESS_COLOR = new Color(118, 255, 0);
+  private static final Color OVERWRITTEN_COLOR = SUCCESS_COLOR;
+  private static final Color RECOVERABLE_COLOR = new Color(255, 181, 71);
 
   /**
    * Truncates the String to the max length and sanitizes it a bit.
@@ -48,20 +51,28 @@ class RenderUtils {
   }
 
   /**
-   * Sets the embed color to the FAIL color.
+   * Applies the given color to the embed.
    *
-   * @param builder the embed builder
+   * @param status the status
+   * @param builder the builder to apply it to
    */
-  static void applyFailColor(EmbedBuilder builder) {
-    builder.setColor(ERROR_COLOR);
-  }
-
-  /**
-   * Sets the embed color to the SUCCESS color.
-   *
-   * @param builder the embed builder
-   */
-  static void applySuccessColor(EmbedBuilder builder) {
-    builder.setColor(SUCCESS_COLOR);
+  static void applyColor(Snippet.Status status, EmbedBuilder builder) {
+    switch (status) {
+      case VALID:
+        builder.setColor(SUCCESS_COLOR);
+        break;
+      case OVERWRITTEN:
+        builder.setColor(OVERWRITTEN_COLOR);
+        break;
+      case REJECTED:
+      case DROPPED:
+      case NONEXISTENT:
+        builder.setColor(ERROR_COLOR);
+        break;
+      case RECOVERABLE_DEFINED:
+      case RECOVERABLE_NOT_DEFINED:
+        builder.setColor(RECOVERABLE_COLOR);
+        break;
+    }
   }
 }
