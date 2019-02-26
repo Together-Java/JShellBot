@@ -18,12 +18,21 @@ import org.togetherjava.discord.server.io.StringOutputStream;
 import org.togetherjava.discord.server.sandbox.AgentAttacher;
 import org.togetherjava.discord.server.sandbox.FilteredExecutionControlProvider;
 
+/**
+ * A light wrapper around {@link JShell}, providing additional features.
+ */
 public class JShellWrapper {
 
   private JShell jShell;
   private StringOutputStream outputStream;
   private TimeWatchdog watchdog;
 
+  /**
+   * Creates a new JShell wrapper using the given config and watchdog.
+   *
+   * @param config the config to gather properties from
+   * @param watchdog the watchdog to schedule kill timer with
+   */
   public JShellWrapper(Config config, TimeWatchdog watchdog) {
     this.watchdog = watchdog;
     this.outputStream = new StringOutputStream(Character.BYTES * 1600);

@@ -3,6 +3,9 @@ package org.togetherjava.discord.server.io.input;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stores all registered input sanitizers and provides means to run them all.
+ */
 public class InputSanitizerManager {
 
   private List<InputSanitizer> sanitizers;

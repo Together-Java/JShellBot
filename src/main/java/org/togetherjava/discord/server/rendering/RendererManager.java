@@ -6,6 +6,9 @@ import jdk.jshell.SnippetEvent;
 import net.dv8tion.jda.core.EmbedBuilder;
 import org.togetherjava.discord.server.execution.JShellWrapper;
 
+/**
+ * Contains {@link Renderer}s and allows running them in series.
+ */
 public class RendererManager {
 
   private List<Renderer> rendererList;
@@ -35,7 +38,7 @@ public class RendererManager {
    *
    * @param builder the builder to render to
    * @param result the {@link org.togetherjava.discord.server.execution.JShellWrapper.JShellResult}
-   * to render
+   *     to render
    */
   public void renderJShellResult(EmbedBuilder builder, JShellWrapper.JShellResult result) {
     RenderUtils.applySuccessColor(builder);

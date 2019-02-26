@@ -23,6 +23,12 @@ public class TimeWatchdog {
   private final Duration maxTime;
   private final AtomicInteger operationCounter;
 
+  /**
+   * Creates a new time watchdog running on the given executor service.
+   *
+   * @param watchdogThreadPool the executor service to run on
+   * @param maxTime the maximum duration to allow
+   */
   public TimeWatchdog(ScheduledExecutorService watchdogThreadPool, Duration maxTime) {
     this.watchdogThreadPool = watchdogThreadPool;
     this.maxTime = maxTime;

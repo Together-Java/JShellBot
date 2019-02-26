@@ -3,6 +3,9 @@ package org.togetherjava.discord.server.rendering;
 import jdk.jshell.EvalException;
 import net.dv8tion.jda.core.EmbedBuilder;
 
+/**
+ * A renderer for exceptions.
+ */
 public class ExceptionRenderer implements Renderer {
 
   @Override

@@ -2,6 +2,9 @@ package org.togetherjava.discord.server.rendering;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 
+/**
+ * A renderer takes care of displaying some message in an embed.
+ */
 public interface Renderer {
 
   /**

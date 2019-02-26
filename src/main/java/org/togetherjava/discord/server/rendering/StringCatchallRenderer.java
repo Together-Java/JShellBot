@@ -4,6 +4,9 @@ import java.util.Objects;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
+/**
+ * A renderer for results that just renders whatever hasn't been renderer yet as a string.
+ */
 public class StringCatchallRenderer implements Renderer {
 
   @Override

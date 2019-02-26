@@ -4,6 +4,9 @@ package org.togetherjava.discord.server.rendering;
 import java.awt.Color;
 import net.dv8tion.jda.core.EmbedBuilder;
 
+/**
+ * Contains utility functions for rendering.
+ */
 class RenderUtils {
 
   static int NEWLINE_MAXIMUM = 10;
@@ -44,10 +47,20 @@ class RenderUtils {
     return input.substring(0, maxLength);
   }
 
+  /**
+   * Sets the embed color to the FAIL color.
+   *
+   * @param builder the embed builder
+   */
   static void applyFailColor(EmbedBuilder builder) {
     builder.setColor(ERROR_COLOR);
   }
 
+  /**
+   * Sets the embed color to the SUCCESS color.
+   *
+   * @param builder the embed builder
+   */
   static void applySuccessColor(EmbedBuilder builder) {
     builder.setColor(SUCCESS_COLOR);
   }

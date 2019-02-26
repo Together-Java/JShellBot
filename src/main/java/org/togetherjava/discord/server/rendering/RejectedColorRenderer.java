@@ -5,6 +5,9 @@ import jdk.jshell.SnippetEvent;
 import net.dv8tion.jda.core.EmbedBuilder;
 import org.togetherjava.discord.server.execution.JShellWrapper;
 
+/**
+ * A renderer that adjusts the color depending on the status of the snippet.
+ */
 public class RejectedColorRenderer implements Renderer {
 
   @Override
