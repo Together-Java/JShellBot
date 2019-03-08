@@ -10,10 +10,12 @@ import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.core.requests.RestAction;
 import org.togetherjava.discord.server.execution.AllottedTimeExceededException;
 import org.togetherjava.discord.server.execution.JShellSessionManager;
 import org.togetherjava.discord.server.execution.JShellWrapper;
@@ -55,7 +57,13 @@ public class CommandHandler extends ListenerAdapter {
 
       JShellWrapper shell = jShellSessionManager.getSessionOrCreate(authorID);
 
-      executeCommand(event.getAuthor(), shell, command, event.getTextChannel());
+      try {
+        executeCommand(event.getAuthor(), shell, command, event.getTextChannel());
+      } catch (UnsupportedOperationException | AllottedTimeExceededException e) {
+        EmbedBuilder embedBuilder = buildCommonEmbed(event.getAuthor(), null);
+        rendererManager.renderObject(embedBuilder, e);
+        send(new MessageBuilder().setEmbed(embedBuilder.build()).sendTo(event.getChannel()));
+      }
     }
   }
 
@@ -109,11 +117,7 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     messageBuilder.setEmbed(embedBuilder.build());
-    messageBuilder.sendTo(channel).submit().thenAccept(message -> {
-      if (autoDeleteMessages) {
-        message.delete().queueAfter(autoDeleteMessageDuration.toMillis(), TimeUnit.MILLISECONDS);
-      }
-    });
+    send(messageBuilder.sendTo(channel));
   }
 
   private EmbedBuilder buildCommonEmbed(User user, Snippet snippet) {
@@ -125,5 +129,13 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     return embedBuilder;
+  }
+
+  private void send(RestAction<Message> action) {
+    action.submit().thenAccept(message -> {
+      if (autoDeleteMessages) {
+        message.delete().queueAfter(autoDeleteMessageDuration.toMillis(), TimeUnit.MILLISECONDS);
+      }
+    });
   }
 }

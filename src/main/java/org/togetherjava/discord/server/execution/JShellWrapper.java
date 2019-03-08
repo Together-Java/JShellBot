@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import jdk.jshell.Diag;
 import jdk.jshell.JShell;
@@ -17,11 +16,11 @@ import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
 import jdk.jshell.SourceCodeAnalysis;
 import jdk.jshell.SourceCodeAnalysis.CompletionInfo;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.togetherjava.discord.server.Config;
 import org.togetherjava.discord.server.io.StringOutputStream;
 import org.togetherjava.discord.server.sandbox.AgentAttacher;
 import org.togetherjava.discord.server.sandbox.FilteredExecutionControlProvider;
+import org.togetherjava.discord.server.sandbox.WhiteBlackList;
 
 /**
  * A light wrapper around {@link JShell}, providing additional features.
@@ -63,16 +62,7 @@ public class JShellWrapper {
   }
 
   private FilteredExecutionControlProvider getExecutionControlProvider(Config config) {
-    return new FilteredExecutionControlProvider(
-        config.getCommaSeparatedList("blocked.packages"),
-        config.getCommaSeparatedList("blocked.classes"),
-        config.getCommaSeparatedList("blocked.methods").stream()
-            .map(s -> {
-              String[] parts = s.split("#");
-              return new ImmutablePair<>(parts[0], parts[1]);
-            })
-            .collect(Collectors.toList())
-    );
+    return new FilteredExecutionControlProvider(WhiteBlackList.fromConfig(config));
   }
 
   /**
