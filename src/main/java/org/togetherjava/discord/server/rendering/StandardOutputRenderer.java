@@ -4,6 +4,9 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import org.togetherjava.discord.server.execution.JShellWrapper;
 
+/**
+ * A renderer for the standard output result.
+ */
 public class StandardOutputRenderer implements Renderer {
 
   @Override

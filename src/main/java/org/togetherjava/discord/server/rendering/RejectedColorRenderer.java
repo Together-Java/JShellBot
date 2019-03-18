@@ -1,10 +1,13 @@
 package org.togetherjava.discord.server.rendering;
 
-import jdk.jshell.Snippet;
+import jdk.jshell.Snippet.Status;
 import jdk.jshell.SnippetEvent;
 import net.dv8tion.jda.core.EmbedBuilder;
 import org.togetherjava.discord.server.execution.JShellWrapper;
 
+/**
+ * A renderer that adjusts the color depending on the status of the snippet.
+ */
 public class RejectedColorRenderer implements Renderer {
 
   @Override
@@ -17,12 +20,9 @@ public class RejectedColorRenderer implements Renderer {
     JShellWrapper.JShellResult result = (JShellWrapper.JShellResult) object;
 
     for (SnippetEvent snippetEvent : result.getEvents()) {
-      if (snippetEvent.status() != Snippet.Status.VALID) {
-        RenderUtils.applyFailColor(builder);
-        break;
-      }
+      RenderUtils.applyColor(snippetEvent.status(), builder);
       if (snippetEvent.exception() != null) {
-        RenderUtils.applyFailColor(builder);
+        RenderUtils.applyColor(Status.REJECTED, builder);
         break;
       }
     }

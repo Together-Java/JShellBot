@@ -11,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.togetherjava.discord.server.Config;
 
+/**
+ * A class managing JShell sessions for every user.
+ */
 public class JShellSessionManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JShellSessionManager.class);

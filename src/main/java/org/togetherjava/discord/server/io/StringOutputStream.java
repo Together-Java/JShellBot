@@ -1,10 +1,12 @@
 package org.togetherjava.discord.server.io;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+/**
+ * An output stream that writes to a string.
+ */
 public class StringOutputStream extends OutputStream {
 
   private static final int INITIAL_BUFFER_SIZE = 64;
@@ -28,7 +30,7 @@ public class StringOutputStream extends OutputStream {
   }
 
   @Override
-  public void write(int b) throws IOException {
+  public void write(int b) {
     ensureCapacity();
 
     if (size < buffer.length && size < maxSize) {

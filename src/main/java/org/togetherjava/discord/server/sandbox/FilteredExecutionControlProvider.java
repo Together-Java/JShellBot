@@ -4,27 +4,21 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
 import jdk.jshell.execution.JdiExecutionControlProvider;
 import jdk.jshell.spi.ExecutionControl;
 import jdk.jshell.spi.ExecutionControlProvider;
 import jdk.jshell.spi.ExecutionEnv;
-import org.apache.commons.lang3.tuple.Pair;
 
 public class FilteredExecutionControlProvider implements ExecutionControlProvider {
 
   private final JdiExecutionControlProvider jdiExecutionControlProvider;
   private final Supplier<FilteredExecutionControl> executionControlSupplier;
 
-  public FilteredExecutionControlProvider(Collection<String> blockedPackages,
-      Collection<String> blockedClasses,
-      Collection<Pair<String, String>> blockedMethods) {
+  public FilteredExecutionControlProvider(WhiteBlackList whiteBlackList) {
     this.jdiExecutionControlProvider = new JdiExecutionControlProvider();
-    this.executionControlSupplier = () -> new FilteredExecutionControl(
-        blockedPackages, blockedClasses, blockedMethods
-    );
+    this.executionControlSupplier = () -> new FilteredExecutionControl(whiteBlackList);
   }
 
   @Override

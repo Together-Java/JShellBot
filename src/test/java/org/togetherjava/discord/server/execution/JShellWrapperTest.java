@@ -29,7 +29,7 @@ class JShellWrapperTest {
   @BeforeAll
   static void setupWrapper() {
     Properties properties = new Properties();
-    properties.setProperty("blocked.packages", "java.time");
+    properties.setProperty("sandbox.blacklist", "java.time");
     Config config = new Config(properties);
     TimeWatchdog timeWatchdog = new TimeWatchdog(
         Executors.newScheduledThreadPool(1),
@@ -45,7 +45,8 @@ class JShellWrapperTest {
 
   @Test
   void reportsCompileTimeError() {
-    JShellWrapper.JShellResult result = wrapper.eval("crazy stuff");
+    // 1crazy is an invalid variable name
+    JShellWrapper.JShellResult result = wrapper.eval("1crazy").get(0);
 
     assertFalse(result.getEvents().isEmpty(), "Found no events");
 
@@ -59,7 +60,7 @@ class JShellWrapperTest {
 
   @Test
   void correctlyComputesExpression() {
-    JShellWrapper.JShellResult result = wrapper.eval("1+1");
+    JShellWrapper.JShellResult result = wrapper.eval("1+1").get(0);
 
     assertEquals(result.getEvents().size(), 1, "Event count is not 1");
 
@@ -73,7 +74,7 @@ class JShellWrapperTest {
   @Test
   void savesHistory() {
     wrapper.eval("int test = 1+1;");
-    JShellWrapper.JShellResult result = wrapper.eval("test");
+    JShellWrapper.JShellResult result = wrapper.eval("test").get(0);
 
     assertEquals(result.getEvents().size(), 1, "Event count is not 1");
 
@@ -100,7 +101,7 @@ class JShellWrapperTest {
       "/tmp/"
   })
   void blocksFileAccess(String fileName) {
-    JShellResult result = wrapper.eval("new java.io.File(\"" + fileName + "\").listFiles()");
+    JShellResult result = wrapper.eval("new java.io.File(\"" + fileName + "\").listFiles()").get(0);
 
     if (!allFailed(result)) {
       printSnippetResult(result);
@@ -115,7 +116,8 @@ class JShellWrapperTest {
   @Test
   void blocksNetworkIo() {
     JShellResult result = wrapper
-        .eval("new java.net.URL(\"https://duckduckgo.com\").openConnection().connect()");
+        .eval("new java.net.URL(\"https://duckduckgo.com\").openConnection().connect()")
+        .get(0);
 
     if (!allFailed(result)) {
       printSnippetResult(result);
@@ -130,7 +132,8 @@ class JShellWrapperTest {
   @Test
   void blocksResettingSecurityManager() {
     JShellResult result = wrapper
-        .eval("System.setSecurityManager(null)");
+        .eval("System.setSecurityManager(null)")
+        .get(0);
 
     if (!allFailed(result)) {
       printSnippetResult(result);

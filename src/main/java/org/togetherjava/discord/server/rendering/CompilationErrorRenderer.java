@@ -5,6 +5,9 @@ import jdk.jshell.Diag;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
+/**
+ * Renders error messages.
+ */
 public class CompilationErrorRenderer implements Renderer {
 
   @Override
