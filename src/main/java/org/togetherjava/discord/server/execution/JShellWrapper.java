@@ -27,6 +27,8 @@ import org.togetherjava.discord.server.sandbox.WhiteBlackList;
  */
 public class JShellWrapper {
 
+  private static final int MAX_ANALYSIS_DEPTH = 40;
+
   private JShell jShell;
   private StringOutputStream outputStream;
   private TimeWatchdog watchdog;
@@ -144,12 +146,30 @@ public class JShellWrapper {
 
     CompletionInfo completionInfo = sourceCodeAnalysis.analyzeCompletion(input);
 
+    int depthCounter = 0;
+
     List<String> fullCommand = new ArrayList<>();
-    while (!completionInfo.remaining().isEmpty()) {
+    // source can be null if the input is malformed (e.g. with a method with a syntax error inside)
+    while (!completionInfo.remaining().isEmpty() && completionInfo.source() != null) {
+      depthCounter++;
+
+      // should not be needed, but a while true loop here blocks a whole thread with a busy loop and
+      // might lead to an OOM if the fullCommand list overflows
+      if (depthCounter > MAX_ANALYSIS_DEPTH) {
+        break;
+      }
+
       fullCommand.add(completionInfo.source());
       completionInfo = sourceCodeAnalysis.analyzeCompletion(completionInfo.remaining());
     }
-    fullCommand.add(completionInfo.source());
+
+    // the final one
+    if (completionInfo.source() != null) {
+      fullCommand.add(completionInfo.source());
+    } else if (completionInfo.remaining() != null) {
+      // or the remaining if it errored
+      fullCommand.add(completionInfo.remaining());
+    }
 
     return fullCommand;
   }
