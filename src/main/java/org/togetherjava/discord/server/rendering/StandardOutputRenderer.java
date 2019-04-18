@@ -20,11 +20,19 @@ public class StandardOutputRenderer implements Renderer {
     if (result.getStdOut().isEmpty()) {
       return builder;
     }
-    return builder
-        .addField(
-            "Output",
-            RenderUtils.truncateAndSanitize(result.getStdOut(), MessageEmbed.VALUE_MAX_LENGTH),
-            true
-        );
+    String output;
+
+    // Discord rejects all-whitespace fields so we need to guard them with a code block
+    // Inline code swallows leading and trailing whitespaces, so it is sadly not up to the task
+    if (result.getStdOut().chars().allMatch(Character::isWhitespace)) {
+      final int fenceLength = "```\n```".length();
+      String inner = RenderUtils
+          .truncateAndSanitize(result.getStdOut(), MessageEmbed.VALUE_MAX_LENGTH - fenceLength);
+      output = "```\n" + inner + "```";
+    } else {
+      output = RenderUtils.truncateAndSanitize(result.getStdOut(), MessageEmbed.VALUE_MAX_LENGTH);
+    }
+
+    return builder.addField("Output", output, true);
   }
 }
