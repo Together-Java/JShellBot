@@ -145,6 +145,28 @@ class JShellWrapperTest {
     );
   }
 
+  @Test()
+  void doesNotEnterInfiniteLoopWhenRunningInvalidMethod() {
+    JShellResult result = wrapper
+        .eval("void beBad() {\n"
+            + "try {\n"
+            + "throw null;\n"
+            + "catch (Throwable e) {\n"
+            + "    e.printStackTrace()\n"
+            + "}\n"
+            + "}\n")
+        .get(0);
+
+    if (!allFailed(result)) {
+      printSnippetResult(result);
+    }
+
+    assertTrue(
+        allFailed(result),
+        "Not all snippets were rejected when checking for a timeout."
+    );
+  }
+
   private boolean allFailed(JShellResult result) {
     return result.getEvents().stream()
         .allMatch(snippetEvent ->
