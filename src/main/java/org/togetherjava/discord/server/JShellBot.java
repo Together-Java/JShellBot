@@ -44,7 +44,6 @@ public class JShellBot {
   private Config getConfig() throws IOException {
     String botConfigPath = System.getenv("JSHELL_BOT_CONFIG");
 
-    // todo instead we should check env variables
     if (botConfigPath == null) {
       botConfigPath = "bot.properties";
     }
