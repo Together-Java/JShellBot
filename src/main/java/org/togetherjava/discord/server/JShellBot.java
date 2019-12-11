@@ -44,6 +44,7 @@ public class JShellBot {
   private Config getConfig() throws IOException {
     String botConfigPath = System.getenv("JSHELL_BOT_CONFIG");
 
+    // todo instead we should check env variables
     if (botConfigPath == null) {
       botConfigPath = "bot.properties";
     }
@@ -56,6 +57,14 @@ public class JShellBot {
               + " or provide a 'bot.properties' file in the same directory as this jar file"
       );
       System.exit(1);
+    } else {
+      Config config = new Config(path);
+      String token = System.getenv("JSHELL_TOKEN");
+      if(token != null){
+        //environment variable override for token i.e. building from container
+        config.setString("token", token);
+      }
+      return config;
     }
 
     return new Config(path);

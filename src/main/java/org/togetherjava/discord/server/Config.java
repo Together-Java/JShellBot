@@ -58,6 +58,16 @@ public class Config {
   }
 
   /**
+   * Sets a property with a string
+   *
+   * @param key the key
+   * @param value the value of the property
+   */
+  public void setString(String key, String value) {
+    properties.setProperty(key, value);
+  }
+
+  /**
    * Tries to parse an entry in ISO-8601 duration format.
    *
    * @param key the key to look up
