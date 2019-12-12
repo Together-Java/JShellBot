@@ -8,6 +8,19 @@ import java.util.Arrays;
  */
 public class JshellSecurityManager extends SecurityManager {
 
+  private static final String[] WHITELISTED_CLASSES = {
+      // CallSite is needed for lambdas
+      "java.lang.invoke.CallSite",
+      // enum set/map because they do a reflective invocation to get the universe
+      // let's hope that is actually safe and EnumSet/Map can not be used to invoke arbitrary code
+      "java.util.EnumSet", "java.util.EnumMap",
+      // Character.getName accesses a system resource (uniName.dat)
+      "java.lang.CharacterName",
+      // Local specific decimal formatting
+      "java.text.DecimalFormatSymbols"
+  };
+
+
   @Override
   public void checkPermission(Permission perm) {
     if (comesFromMe()) {
@@ -15,7 +28,7 @@ public class JshellSecurityManager extends SecurityManager {
     }
 
     // lambda init call
-    if (containsClass("java.lang.invoke.CallSite")) {
+    if (containsWhitelistedClass()) {
       return;
     }
 
@@ -39,10 +52,12 @@ public class JshellSecurityManager extends SecurityManager {
         .anyMatch(aClass -> aClass == getClass());
   }
 
-  private boolean containsClass(String name) {
+  private boolean containsWhitelistedClass() {
     for (Class<?> aClass : getClassContext()) {
-      if (aClass.getName().equals(name)) {
-        return true;
+      for (String s : WHITELISTED_CLASSES) {
+        if (s.equals(aClass.getName())) {
+          return true;
+        }
       }
     }
     return false;
