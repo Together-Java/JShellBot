@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
+
+import net.dv8tion.jda.api.AccountType;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +34,10 @@ public class JShellBot {
       System.exit(2);
     }
 
-    JDA jda = new JDABuilder(AccountType.BOT)
-        .setToken(config.getString("token"))
-        .addEventListener(new CommandHandler(config))
-        .build();
+    JDA jda = JDABuilder.createDefault(config.getString("token"))
+            .setDisabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES)
+            .addEventListeners(new CommandHandler(config))
+            .build();
     jda.awaitReady();
 
     LOGGER.info("Goliath Online");
