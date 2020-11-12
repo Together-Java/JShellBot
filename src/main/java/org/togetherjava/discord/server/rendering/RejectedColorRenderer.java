@@ -2,7 +2,7 @@ package org.togetherjava.discord.server.rendering;
 
 import jdk.jshell.Snippet.Status;
 import jdk.jshell.SnippetEvent;
-import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
 import org.togetherjava.discord.server.execution.JShellWrapper;
 
 /**

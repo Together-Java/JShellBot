@@ -2,8 +2,8 @@ package org.togetherjava.discord.server.rendering;
 
 import java.util.Locale;
 import jdk.jshell.Diag;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 /**
  * Renders error messages.

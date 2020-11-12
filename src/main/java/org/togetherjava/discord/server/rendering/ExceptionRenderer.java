@@ -3,7 +3,7 @@ package org.togetherjava.discord.server.rendering;
 import java.util.Objects;
 import jdk.jshell.EvalException;
 import jdk.jshell.Snippet.Status;
-import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 /**
  * A renderer for exceptions.

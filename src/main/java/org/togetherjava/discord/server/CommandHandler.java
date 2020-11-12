@@ -8,14 +8,14 @@ import java.util.regex.Pattern;
 import jdk.jshell.Diag;
 import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.dv8tion.jda.core.requests.RestAction;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.togetherjava.discord.server.execution.AllottedTimeExceededException;
 import org.togetherjava.discord.server.execution.JShellSessionManager;
 import org.togetherjava.discord.server.execution.JShellWrapper;
@@ -94,7 +94,7 @@ public class CommandHandler extends ListenerAdapter {
   }
 
   private void handleResult(User user, JShellWrapper.JShellResult result, JShellWrapper shell,
-      MessageChannel channel) {
+                            MessageChannel channel) {
     MessageBuilder messageBuilder = new MessageBuilder();
     EmbedBuilder embedBuilder;
 

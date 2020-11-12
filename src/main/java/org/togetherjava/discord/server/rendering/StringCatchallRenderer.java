@@ -1,8 +1,9 @@
 package org.togetherjava.discord.server.rendering;
 
 import java.util.Objects;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.MessageEmbed;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 /**
  * A renderer for results that just renders whatever hasn't been renderer yet as a string.
