@@ -2,7 +2,7 @@ package org.togetherjava.discord.server.rendering;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
