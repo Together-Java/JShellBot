@@ -3,7 +3,7 @@ package org.togetherjava.discord.server.rendering;
 
 import java.awt.Color;
 import jdk.jshell.Snippet;
-import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 /**
  * Contains utility functions for rendering.
