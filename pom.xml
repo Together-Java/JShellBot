@@ -34,6 +34,7 @@
               <workingDirectory>${project.basedir}</workingDirectory>
               <arguments>
                 <argument>rmi</argument>
+                <argument>-f</argument>
                 <argument>jshellbot:${project.version}</argument>
               </arguments>
             </configuration>
