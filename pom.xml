@@ -52,7 +52,7 @@
                 <argument>-t</argument>
                 <argument>jshellbot:${project.version}</argument>
                 <argument>--build-arg</argument>
-                <argument>token={discord.token}</argument>
+                <argument>token=${discord.token}</argument>
                 <argument>.</argument>
               </arguments>
             </configuration>
