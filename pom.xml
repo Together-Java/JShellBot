@@ -24,22 +24,6 @@
         <version>3.0.0</version>
         <executions>
           <execution>
-            <id>docker-clean</id>
-            <phase>clean</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>docker</executable>
-              <workingDirectory>${project.basedir}</workingDirectory>
-              <arguments>
-                <argument>rmi</argument>
-                <argument>-f</argument>
-                <argument>jshellbot:${project.version}</argument>
-              </arguments>
-            </configuration>
-          </execution>
-          <execution>
             <id>docker-build</id>
             <phase>install</phase>
             <goals>
