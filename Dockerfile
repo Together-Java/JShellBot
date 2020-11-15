@@ -13,7 +13,7 @@ RUN mvn --version
 WORKDIR /var/src
 COPY src/ .
 COPY pom.xml .
-RUN mvn clean compile package && mkdir /var/app && cp -r target/* /var/app
+RUN mvn package && mkdir /var/app && cp -r target/* /var/app
 
 WORKDIR /var/app
 COPY etc/_example.bot.properties .
