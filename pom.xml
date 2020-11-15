@@ -19,6 +19,47 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>docker-clean</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>docker</executable>
+              <workingDirectory>${project.basedir}</workingDirectory>
+              <arguments>
+                <argument>rmi</argument>
+                <argument>jshellbot:${project.version}</argument>
+              </arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>docker-build</id>
+            <phase>install</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>docker</executable>
+              <workingDirectory>${project.basedir}</workingDirectory>
+              <arguments>
+                <argument>build</argument>
+                <argument>-t</argument>
+                <argument>jshellbot:${project.version}</argument>
+                <argument>--build-arg</argument>
+                <argument>token={discord.token}</argument>
+                <argument>.</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
@@ -32,7 +73,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.1.1</version>
+        <version>3.2.0</version>
         <executions>
           <execution>
             <id>shade</id>
@@ -44,13 +85,10 @@
         </executions>
         <configuration>
           <finalName>JShellBot</finalName>
-
           <transformers>
             <transformer
               implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-              <manifestEntries>
-                <Main-Class>org.togetherjava.discord.server.JShellBot</Main-Class>
-              </manifestEntries>
+              <mainClass>org.togetherjava.discord.server.JShellBot</mainClass>
             </transformer>
           </transformers>
         </configuration>
@@ -74,6 +112,16 @@
   </repositories>
 
   <dependencies>
+    <dependency>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>exec-maven-plugin</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-shade-plugin</artifactId>
+      <version>3.2.0</version>
+    </dependency>
     <!--DISCORD API-->
     <dependency>
       <groupId>net.dv8tion</groupId>
